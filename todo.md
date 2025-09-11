@@ -1,0 +1,117 @@
+# Backend Development To-Do (from User Stories)
+
+## 1. Core Setup
+
+- [ ] Initialize NestJS project with Postgres + TypeORM.
+- [ ] Configure dotenv and environment variables.
+- [ ] Add docker-compose for Postgres (local dev).
+- [ ] Setup TypeORM migrations.
+- [ ] Implement global pipes for validation/transform (class-validator, class-transformer).
+- [ ] Add JWT authentication & Passport.
+- [ ] Configure logging and error handling middleware.
+
+## 2. Authentication & User Management
+
+- [ ] Implement User entity (common fields: id, email, passwordHash, role).
+- [ ] Roles: CLIENT, FREELANCER, ADMIN.
+- [ ] Register (signup) endpoint:
+  - [ ] Client registration (basic profile).
+  - [ ] Freelancer registration (profile + skills).
+- [ ] Login endpoint (JWT issue).
+- [ ] Password hashing with bcrypt.
+- [ ] JWT Guard & Role Guard for protected routes.
+- [ ] User profile update (name, bio, skills, etc).
+- [ ] Email verification flow (optional MVP: skip).
+
+## 3. Freelancer Side
+
+- [ ] Gig entity (title, description, category, price, ownerId).
+- [ ] CRUD for gigs:
+  - [ ] Create gig.
+  - [ ] Update gig.
+  - [ ] Delete gig.
+  - [ ] Get freelancer’s gigs.
+- [ ] View orders assigned to freelancer.
+- [ ] Submit deliverables for orders.
+- [ ] Earnings tracking (wallet balance).
+
+## 4. Client Side
+
+- [ ] Project entity (title, description, budget, deadline, postedBy).
+- [ ] Post new project.
+- [ ] View list of projects.
+- [ ] Receive freelancer proposals.
+- [ ] Accept proposal → create Order.
+- [ ] Pay via escrow (mark as paid).
+- [ ] Leave review after completion.
+
+## 5. Order & Transaction System
+
+- [ ] Order entity (clientId, freelancerId, gigId or projectId, status).
+- [ ] Order lifecycle:
+  - [ ] CREATED → IN_PROGRESS → SUBMITTED → COMPLETED / CANCELLED.
+- [ ] Transaction entity (amount, type [escrow, payout, refund], orderId).
+- [ ] Escrow service:
+  - [ ] Hold funds when client pays.
+  - [ ] Release to freelancer when order is completed.
+- [ ] Refund flow if dispute resolved in client’s favor.
+
+## 6. Messaging & Communication
+
+- [ ] Conversation entity (clientId, freelancerId).
+- [ ] Message entity (conversationId, senderId, content, attachments).
+- [ ] Endpoints:
+  - [ ] Start conversation.
+  - [ ] Send message.
+  - [ ] Get conversation history.
+- [ ] Optional: WebSocket integration for real-time chat (future enhancement).
+
+## 7. Reviews & Ratings
+
+- [ ] Review entity (orderId, reviewerId, revieweeId, rating, comment).
+- [ ] Endpoints:
+  - [ ] Leave review after order completion.
+  - [ ] Get average rating for freelancer.
+- [ ] Prevent duplicate reviews for the same order.
+
+## 8. Admin & Moderation
+
+- [ ] Admin dashboard endpoints:
+  - [ ] List all users, gigs, projects, orders.
+  - [ ] Ban/suspend user.
+  - [ ] Resolve disputes.
+  - [ ] View transactions & platform revenue.
+- [ ] Reporting system (basic: report a user/gig).
+
+## 9. Platform Finance
+
+- [ ] Commission model (platform takes percentage of each transaction).
+- [ ] Track platform earnings.
+- [ ] Withdrawal request entity (freelancer requests payout).
+- [ ] Admin approves/marks withdrawal as paid.
+
+## 10. Notifications
+
+- [ ] Simple notifications system:
+  - [ ] New proposal.
+  - [ ] New order.
+  - [ ] Order status updates.
+- [ ] Store in DB (Notification entity).
+- [ ] Expose via REST API.
+- [ ] (Future: push/email notifications).
+
+## 11. Infrastructure & Deployment
+
+- [ ] Add config for multiple environments (dev, staging, prod).
+- [ ] Setup Dockerfile for backend.
+- [ ] Deploy to cloud (e.g., AWS/GCP/Heroku).
+- [ ] Add CI/CD pipeline (GitHub Actions).
+- [ ] Setup monitoring/logging (Winston, Sentry).
+
+## 12. Future Enhancements (Post-MVP)
+
+- [ ] Payment gateway integration (Paystack, Stripe, Coinbase Commerce).
+- [ ] Real-time messaging with WebSockets.
+- [ ] Advanced search/filter for gigs & freelancers.
+- [ ] Recommendation system (AI/ML).
+- [ ] Escrow automation with smart contracts (if blockchain integrated).
