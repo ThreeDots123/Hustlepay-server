@@ -1,10 +1,11 @@
-export const PORT = 'PORT';
+export const PORT = '3007';
 
 export const NODE_ENV = 'NODE_ENV';
 
-export const DB_HOST = 'TYPEORM_DATABASE_HOST';
-export const DB_PORT = 'TYPEORM_DATABASE_PORT';
-export const DB_USERNAME = 'TYPEORM_DATABASE_USERNAME';
-export const DB_PASSWORD = 'TYPEORM_DATABASE_PASSWORD';
-export const DB_NAME = 'TYPEORM_DATABASE_NAME';
-export const JWT_SERVICE = 'JWT_SERVICE';
+export const DB_HOST = 'localhost';
+export const DB_PORT = '5432';
+export const DB_USERNAME = 'ucheokenyi';
+export const DB_PASSWORD = 'nestpass';
+export const DB_NAME = 'nestdb';
+export const JWT_SERVICE = 'supersecret';
+export const SALT_ROUNDS = 10;
