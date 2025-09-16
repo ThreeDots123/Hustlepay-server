@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entities';
 import * as bcrypt from 'bcryptjs';
-import { SALT_ROUNDS } from 'src/config/env';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +23,7 @@ export class UsersService {
       throw new ConflictException('Email already exists');
     }
 
-    const saltround = parseInt(`${SALT_ROUNDS}`, 10) || 10;
+    const saltround = parseInt(`${process.env.SALT_ROUNDS}`, 10) || 10;
     const salt = await bcrypt.genSalt(saltround);
     const hashpassword = await bcrypt.hash(data.password, salt);
 

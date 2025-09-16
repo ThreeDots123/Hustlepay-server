@@ -5,11 +5,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseTransformerInterceptor } from './interceptors/response.interceptor';
 import { ExceptionFilter } from './interceptors/exception-filter.interceptor';
-import { PORT } from './config/env';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-
+  console.log('Loaded DB_HOST:', configService.get('DB_HOST'));
   // Enabling validation globally with dto files
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -29,6 +29,6 @@ async function bootstrap() {
   //* Handle Exceptions
   app.useGlobalFilters(new ExceptionFilter());
 
-  await app.listen(configService.getOrThrow<number>(PORT));
+  await app.listen(configService.getOrThrow<number>('PORT'));
 }
 bootstrap();
