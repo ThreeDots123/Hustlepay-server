@@ -2,13 +2,12 @@
 
 ## 1. Core Setup
 
-- [ ] Initialize NestJS project with Postgres + TypeORM.
-- [ ] Configure dotenv and environment variables.
-- [ ] Add docker-compose for Postgres (local dev).
-- [ ] Setup TypeORM migrations.
-- [ ] Implement global pipes for validation/transform (class-validator, class-transformer).
+- [x] Initialize NestJS project with Postgres + TypeORM.
+- [x] Configure dotenv and environment variables.
+- [x] Setup TypeORM migrations.
+- [x] Implement global pipes for validation/transform (class-validator, class-transformer).
 - [ ] Add JWT authentication & Passport.
-- [ ] Configure logging and error handling middleware.
+- [x] Configure logging and error handling middleware.
 
 ## 2. Authentication & User Management
 
