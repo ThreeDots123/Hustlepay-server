@@ -6,21 +6,25 @@
 - [x] Configure dotenv and environment variables.
 - [x] Setup TypeORM migrations.
 - [x] Implement global pipes for validation/transform (class-validator, class-transformer).
-- [ ] Add JWT authentication & Passport.
+- [x] Add JWT authentication & Passport.
 - [x] Configure logging and error handling middleware.
 
 ## 2. Authentication & User Management
 
-- [ ] Implement User entity (common fields: id, email, passwordHash, role).
-- [ ] Roles: CLIENT, FREELANCER, ADMIN.
-- [ ] Register (signup) endpoint:
+- [x] Implement User entity (common fields: id, email, passwordHash, role).
+- [x] Roles: CLIENT, FREELANCER, ADMIN.
+- [x] Register (signup) endpoint:
   - [ ] Client registration (basic profile).
   - [ ] Freelancer registration (profile + skills).
 - [ ] Login endpoint (JWT issue).
-- [ ] Password hashing with bcrypt.
+- [x] Password hashing with bcrypt.
 - [ ] JWT Guard & Role Guard for protected routes.
 - [ ] User profile update (name, bio, skills, etc).
 - [ ] Email verification flow (optional MVP: skip).
+- [ ] User status may be required later?
+  - [ ] Add to dto user response
+- [ ] Catch email already exists
+- [ ] Event to manage user registeration workflow
 
 ## 3. Freelancer Side
 

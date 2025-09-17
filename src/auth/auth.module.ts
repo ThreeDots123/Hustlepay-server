@@ -1,25 +1,27 @@
-import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UsersService } from 'src/user/user.service';
-import { User } from 'src/user/user.entities';
-import { JwtStrategy } from './jwt.strategy';
+import { Module } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AuthService } from "./auth.service";
+import { AuthController } from "./auth.controller";
+import { UsersService } from "src/user/user.service";
+import { JwtStrategy } from "./jwt.strategy";
+import { JWT_SECRET } from "src/config/env";
+import { User } from "src/model/user.entity";
+import { PasswordModule } from "src/password/password.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
+    PasswordModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SERVICE') || 'secret123',
-        signOptions: { expiresIn: '1h' },
+        secret: configService.getOrThrow<string>(JWT_SECRET),
+        signOptions: { expiresIn: "1h" },
       }),
     }),
   ],

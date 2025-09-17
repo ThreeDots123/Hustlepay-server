@@ -1,26 +1,32 @@
-import { ConfigService } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from 'src/user/user.entities';
+import { ConfigService } from "@nestjs/config";
+import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USERNAME,
+  NODE_ENV,
+} from "./env";
 
 export default function databaseConfig(
   configService: ConfigService,
-): TypeOrmModuleOptions {
+): PostgresConnectionOptions {
   return {
-    type: 'postgres',
-    host: configService.getOrThrow<string>('DB_HOST'),
-    port: parseInt(configService.getOrThrow<string>('DB_PORT')),
-    username: configService.getOrThrow<string>('DB_USERNAME'),
-    password: configService.getOrThrow<string>('DB_PASSWORD'),
-    database: configService.getOrThrow<string>('DB_NAME'),
-    autoLoadEntities: true,
-    synchronize: true,
-    entities: [User],
+    type: "postgres",
+    host: configService.getOrThrow(DB_HOST),
+    port: parseInt(configService.getOrThrow(DB_PORT)),
+    username: configService.getOrThrow(DB_USERNAME),
+    password: configService.getOrThrow(DB_PASSWORD),
+    database: configService.getOrThrow(DB_NAME),
 
-    migrationsTableName: 'migration',
+    entities: ["dist/model/*.entity.js"],
 
-    migrations: ['dist/migrations/*.js'],
+    migrationsTableName: "migration",
 
-    ...(configService.getOrThrow<string>('NODE_ENV') === 'production' && {
+    migrations: ["dist/migrations/*.js"],
+
+    ...(configService.getOrThrow<string>(NODE_ENV) === "production" && {
       ssl: {
         rejectUnauthorized: false, // This will allow self-signed certificates
       },
