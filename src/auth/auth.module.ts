@@ -10,12 +10,18 @@ import { JwtStrategy } from "./jwt.strategy";
 import { JWT_SECRET } from "src/config/env";
 import { User } from "src/model/user.entity";
 import { PasswordModule } from "src/password/password.module";
+import { ProfileModule } from "src/profile/profile.module";
+import { TokenModule } from "src/token/token.module";
+import { EmailModule } from "src/email/email.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
     PasswordModule,
+    ProfileModule,
+    TokenModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

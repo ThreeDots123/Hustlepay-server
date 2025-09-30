@@ -1,6 +1,6 @@
 import { Exclude, Expose, Transform } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
-import { UserRole } from "src/model/user.entity";
+import { UserRole, UserStatus } from "src/model/user.entity";
 
 export class UserResponseDto {
   @ApiProperty({
@@ -32,6 +32,15 @@ export class UserResponseDto {
   @Expose()
   @Transform(({ value }) => value.toString())
   role: UserRole;
+
+  @ApiProperty({
+    description: "The current status of the user",
+    enum: UserRole,
+    example: UserRole.CLIENT,
+  })
+  @Expose()
+  @Transform(({ value }) => value.toString())
+  status: UserStatus;
 
   @ApiProperty({
     description: "Timestamp when the user was created",

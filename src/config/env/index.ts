@@ -1,11 +1,15 @@
-export const PORT = 'PORT';
+export const PORT = "PORT";
 
-export const NODE_ENV = 'NODE_ENV';
+export const NODE_ENV = "NODE_ENV";
 
-export const DB_HOST = 'TYPEORM_DATABASE_HOST';
-export const DB_PORT = 'TYPEORM_DATABASE_PORT';
-export const DB_USERNAME = 'TYPEORM_DATABASE_USERNAME';
-export const DB_PASSWORD = 'TYPEORM_DATABASE_PASSWORD';
-export const DB_NAME = 'TYPEORM_DATABASE_NAME';
+export const DB_HOST = "TYPEORM_DATABASE_HOST";
+export const DB_PORT = "TYPEORM_DATABASE_PORT";
+export const DB_USERNAME = "TYPEORM_DATABASE_USERNAME";
+export const DB_PASSWORD = "TYPEORM_DATABASE_PASSWORD";
+export const DB_NAME = "TYPEORM_DATABASE_NAME";
 
-export const JWT_SECRET = 'JWT_SECRET';
+export const JWT_SECRET = "JWT_SECRET";
+
+export const MAILJET_API_KEY = "MAILJET_API_KEY";
+export const MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY";
+export const MAILJET_NOREPLY_ADDRESS = "MAILJET_NOREPLY_ADDRESS";

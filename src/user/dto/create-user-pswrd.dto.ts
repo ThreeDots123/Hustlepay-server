@@ -8,6 +8,7 @@ import {
 } from "class-validator";
 import { Expose, Transform } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
+import { UserRole } from "src/model/user.entity";
 
 export class CreateUserDto {
   @Expose()
@@ -43,6 +44,15 @@ export class CreateUserDto {
     example: "john.doe@example.com",
   })
   email: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim().toLowerCase())
+  @ApiProperty({
+    description: "The role of the user",
+    example: "freelancer",
+  })
+  role: UserRole;
 
   @Expose()
   @IsOptional()

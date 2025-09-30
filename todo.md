@@ -14,17 +14,18 @@
 - [x] Implement User entity (common fields: id, email, passwordHash, role).
 - [x] Roles: CLIENT, FREELANCER, ADMIN.
 - [x] Register (signup) endpoint:
-  - [ ] Client registration (basic profile).
-  - [ ] Freelancer registration (profile + skills).
-- [ ] Login endpoint (JWT issue).
+  - [x] Client registration (basic profile).
+  - [x] Freelancer registration (profile + skills).
+- [x] Login endpoint (JWT issue).
 - [x] Password hashing with bcrypt.
-- [ ] JWT Guard & Role Guard for protected routes.
-- [ ] User profile update (name, bio, skills, etc).
-- [ ] Email verification flow (optional MVP: skip).
-- [ ] User status may be required later?
-  - [ ] Add to dto user response
-- [ ] Catch email already exists
-- [ ] Event to manage user registeration workflow
+- [x] JWT Guard & Role Guard for protected routes.
+- [ ] Password reset (Add emailing template)
+- [x] User profile update (name, bio, skills, etc).
+- [x] Email verification flow (optional MVP: skip).
+- [x] User status may be required later?
+  - [ ] Add to dto user response (Not decided yet)
+- [x] Catch email already exists
+- [x] Event to manage user registeration workflow - FIX - ENUM DTO FOR USER ROLE ON USER CREATION
 
 ## 3. Freelancer Side
 

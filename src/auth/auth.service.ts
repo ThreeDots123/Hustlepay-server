@@ -6,6 +6,9 @@ import { CreateUserDto } from "../user/dto/create-user-pswrd.dto";
 import { InjectEntityManager } from "@nestjs/typeorm";
 import { UsersService } from "src/user/user.service";
 import { PasswordService } from "src/password/password.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import events from "src/event";
+import { UserCreatedEvent } from "src/event/subscribers/user/user-created.subscriber";
 
 @Injectable()
 export class AuthService {
@@ -13,6 +16,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private passwordService: PasswordService,
+    private eventEmitter: EventEmitter2,
     @InjectEntityManager() private readonly manager: EntityManager,
   ) {}
 
@@ -37,6 +41,16 @@ export class AuthService {
         );
 
         // Emit event to handle user registeration workflow
+        // Emit an event for created user
+        this.eventEmitter.emit(events.user.created, {
+          event: new UserCreatedEvent(
+            user.email,
+            user.firstname,
+            user.id,
+            user.role,
+          ),
+          transactionalManager,
+        });
 
         return user;
       },

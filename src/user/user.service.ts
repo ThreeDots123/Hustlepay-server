@@ -6,25 +6,37 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, FindOptionsWhere, Repository } from "typeorm";
-import { User as UserEntity } from "src/model/user.entity";
+import {
+  User as UserEntity,
+  UserRole,
+  UserStatus,
+} from "src/model/user.entity";
 import { CreateUserDto } from "src/user/dto/create-user-pswrd.dto";
 import BaseService from "src/interface/service/base.service";
 import { userEmailAlreadyExists } from "src/constants/response-messages";
+import { ProfileService } from "src/profile/profile.service";
 
 @Injectable()
 export class UsersService extends BaseService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    private profileService: ProfileService,
   ) {
     super();
   }
 
   async createUser(
     userData: Omit<CreateUserDto, "password">,
-    transactionalEntity?: EntityManager | undefined,
+    transactionalEntity?: EntityManager,
   ) {
-    const newUserInstance = this.usersRepository.create({ ...userData });
+    const newUserInstance = this.usersRepository.create({
+      ...userData,
+      status:
+        userData.role === UserRole.FREELANCER
+          ? UserStatus.PENDING
+          : UserStatus.ACTIVE,
+    });
 
     try {
       const user = await this.performEntityOps<UserEntity, UserEntity>({
@@ -35,7 +47,16 @@ export class UsersService extends BaseService {
       });
 
       // Create extra table for extra records (like profile)
-      // await this.createUserProfile(user, transactionalEntity);
+      if (user.role === UserRole.CLIENT)
+        await this.profileService.createClientProfile(
+          user.id,
+          transactionalEntity,
+        );
+      else if (user.role === UserRole.FREELANCER)
+        await this.profileService.createFreelacerProfile(
+          user.id,
+          transactionalEntity,
+        );
 
       return user;
     } catch (err) {
@@ -54,7 +75,7 @@ export class UsersService extends BaseService {
       relations?: Array<string>;
       where?: FindOptionsWhere<UserEntity> | FindOptionsWhere<UserEntity>[];
     },
-    transactionalEntity?: EntityManager | undefined,
+    transactionalEntity?: EntityManager,
   ) {
     return this.performEntityOps<UserEntity, UserEntity>({
       repositoryManager: this.usersRepository,
@@ -70,11 +91,20 @@ export class UsersService extends BaseService {
     });
   }
 
-  async updateUserLogin(
-    userId: string,
-    transactionalEntity?: EntityManager | undefined,
+  async updateUser(
+    id: string,
+    newRecord: Partial<UserEntity>,
+    transactionalEntity?: EntityManager,
   ) {
-    transactionalEntity?.update(UserEntity, { id: userId }, { lastLogin: "" });
+    await this.performEntityOps<UserEntity, UserEntity>({
+      repositoryManager: this.usersRepository,
+      transactionalEntity,
+      action: "update",
+      opsArgs: [UserEntity, { id }, { ...newRecord }],
+    });
+  }
+
+  async updateUserLogin(userId: string, transactionalEntity?: EntityManager) {
     await this.performEntityOps<UserEntity, UserEntity>({
       repositoryManager: this.usersRepository,
       transactionalEntity,
