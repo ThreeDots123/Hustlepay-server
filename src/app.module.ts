@@ -12,6 +12,7 @@ import { ProfileModule } from './profile/profile.module';
 import { EventModule } from './event/event.module';
 import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
+import { GigsModule } from './gigs/gigs.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,6 +31,7 @@ import { TokenModule } from './token/token.module';
     EventModule,
     EmailModule,
     TokenModule,
+    GigsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

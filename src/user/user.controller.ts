@@ -8,7 +8,7 @@ import {
   Param,
   Body,
 } from "@nestjs/common";
-import { JwtAuthGuard } from "src/auth/jwt.guard";
+import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { UsersService } from "./user.service";
 import { ProfileService } from "src/profile/profile.service";
 import transformUserProfile from "src/transformers/user-profile";

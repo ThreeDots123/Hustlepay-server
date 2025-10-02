@@ -16,7 +16,7 @@ import { UsersService } from "src/user/user.service";
 import { EmailService } from "src/email/email.service";
 import { TokenService } from "src/token/token.service";
 import { OtpPurpose } from "src/model/otp.entity";
-import { JwtAuthGuard } from "./jwt.guard";
+import { JwtAuthGuard } from "./guards/jwt.guard";
 import { VerifyEmailTokenDto } from "src/token/dto/verify-token.dto";
 
 @Controller("auth")

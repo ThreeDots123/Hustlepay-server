@@ -39,6 +39,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "express-session": "^1.18.2",
+    "nestjs-typeorm-paginate": "^4.1.0",
     "node-mailjet": "^6.0.9",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",

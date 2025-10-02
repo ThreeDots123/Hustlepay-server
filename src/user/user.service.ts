@@ -105,12 +105,11 @@ export class UsersService extends BaseService {
   }
 
   async updateUserLogin(userId: string, transactionalEntity?: EntityManager) {
-    await this.performEntityOps<UserEntity, UserEntity>({
-      repositoryManager: this.usersRepository,
+    await this.updateUser(
+      userId,
+      { lastLogin: new Date() },
       transactionalEntity,
-      action: "update",
-      opsArgs: [UserEntity, { id: userId }, { lastLogin: new Date() }],
-    });
+    );
   }
 
   async findUserById(id: any): Promise<UserEntity | null> {
