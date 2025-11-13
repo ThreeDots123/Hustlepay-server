@@ -51,12 +51,11 @@ export class UserResponseDto {
   createdAt: Date;
 
   @ApiProperty({
-    description: "Timestamp when the user was last updated",
-    example: "2024-03-14T12:00:00Z",
+    description: "Tells if the user's account has been verified.",
+    example: "false",
   })
   @Expose()
-  @Transform(({ value }) => new Date(value))
-  updatedAt: Date;
+  isVerified: boolean;
 
   @Exclude()
   deletedAt: Date;

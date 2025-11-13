@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany } from "typeorm";
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
-import { Skill } from "./skill.entity";
+import { Proposal } from "./proposal.entity";
+import { FreelancerProfile } from "./freelancer-profile.entity";
 
 @Entity("skill_catalog")
 export class SkillCatalog extends SoftDeletableEntity {
@@ -12,6 +13,9 @@ export class SkillCatalog extends SoftDeletableEntity {
   @Column({ name: "category", nullable: true })
   category: string; // e.g. "Programming", "Design", "Marketing"
 
-  @OneToMany(() => Skill, (skill) => skill.catalog)
-  skills: Skill[];
+  @ManyToMany(() => Proposal, (proposal) => proposal.skills)
+  proposals: Proposal[];
+
+  @ManyToMany(() => FreelancerProfile, (freelancer) => freelancer.skills)
+  freelancers: FreelancerProfile[];
 }

@@ -1,7 +1,15 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+} from "typeorm";
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
 import { User } from "./user.entity";
-import { Skill } from "./skill.entity";
+import { SkillCatalog } from "./skill-catalog.entity";
 
 @Entity("freelancer_profile")
 export class FreelancerProfile extends SoftDeletableEntity {
@@ -26,8 +34,9 @@ export class FreelancerProfile extends SoftDeletableEntity {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @OneToMany(() => Skill, (skill) => skill.freelancerProfile, {
+  @ManyToMany(() => SkillCatalog, (skill) => skill.freelancers, {
     cascade: true,
   })
-  skills: Skill[];
+  @JoinTable({ name: "freelancer_skills" })
+  skills: SkillCatalog[];
 }

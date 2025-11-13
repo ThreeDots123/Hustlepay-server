@@ -8,11 +8,14 @@ import databaseConfig from "./config/database.config";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { PasswordModule } from "./password/password.module";
-import { ProfileModule } from './profile/profile.module';
-import { EventModule } from './event/event.module';
-import { EmailModule } from './email/email.module';
-import { TokenModule } from './token/token.module';
-import { GigsModule } from './gigs/gigs.module';
+import { ProfileModule } from "./profile/profile.module";
+import { EventModule } from "./event/event.module";
+import { EmailModule } from "./email/email.module";
+import { TokenModule } from "./token/token.module";
+import { ProposalModule } from "./proposal/proposal.module";
+import { BidModule } from "./bid/bid.module";
+import { ContractModule } from './contract/contract.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,7 +34,9 @@ import { GigsModule } from './gigs/gigs.module';
     EventModule,
     EmailModule,
     TokenModule,
-    GigsModule,
+    ProposalModule,
+    BidModule,
+    ContractModule,
   ],
   controllers: [AppController],
   providers: [AppService],

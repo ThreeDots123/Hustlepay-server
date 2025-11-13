@@ -16,6 +16,9 @@ import { UserRole } from "src/model/user.entity";
 import { AuthorisedRequest } from "src/common/types";
 import { ClientProfileDto } from "src/profile/dto/client-profile.dto";
 import { FreelancerProfileDto } from "src/profile/dto/freelancer-profile.dto";
+import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
+import transformToAuthenticatedUser from "src/transformers/authenticated-user";
 
 @Controller("users")
 export class UsersController {
@@ -24,7 +27,7 @@ export class UsersController {
     private profileService: ProfileService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(IsFreelancerGuard)
   @Get("freelancer/profile")
   async getFreelancerProfile(@Req() request: Request) {
     const { id, role } = request.user as AuthorisedRequest;
@@ -38,7 +41,7 @@ export class UsersController {
     return transformUserProfile(user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(IsClientGuard)
   @Get("client/profile")
   async getClientProfile(@Req() request: Request) {
     const { id, role } = request.user as AuthorisedRequest;
@@ -52,7 +55,7 @@ export class UsersController {
     return transformUserProfile(user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(IsFreelancerGuard)
   @Put("freelancer/profile")
   async updateFreelancerProfile(
     @Req() request: Request,
@@ -64,7 +67,7 @@ export class UsersController {
     return "updated";
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(IsClientGuard)
   @Put("client/profile")
   async updateClientProfile(
     @Req() request: Request,
@@ -74,5 +77,16 @@ export class UsersController {
     await this.profileService.updateClientProfile(id, _body);
 
     return "updated";
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("me")
+  async getUserDetails(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.usersService.findSingleUser({
+      where: { id },
+    });
+
+    return transformToAuthenticatedUser(user);
   }
 }

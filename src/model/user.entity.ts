@@ -1,7 +1,12 @@
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
 import { DbAwareColumn, resolveDbType } from "src/utils/db-parse-column";
-import { Column, Entity, OneToOne } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne } from "typeorm";
 import { Password } from "./user-password.entity";
+import { Proposal } from "./proposal.entity";
+import { Bid } from "./bid.entity";
+import { Contract } from "./contract.entity";
+import { Message } from "./message.entity";
+import { Payment } from "./payment.entity";
 
 export enum UserRole {
   FREELANCER = "freelancer",
@@ -73,4 +78,22 @@ export class User extends SoftDeletableEntity {
 
   @OneToOne(() => Password, (pswd) => pswd.user)
   password: Password;
+
+  @OneToMany(() => Proposal, (proposal) => proposal.client)
+  proposals: Proposal[];
+
+  @OneToMany(() => Bid, (bid) => bid.freelancer)
+  bids: Bid[];
+
+  @OneToMany(() => Contract, (contract) => contract.client)
+  clientContracts: Contract[];
+
+  @OneToMany(() => Contract, (contract) => contract.freelancer)
+  freelancerContracts: Contract[];
+
+  @OneToMany(() => Message, (m) => m.sender)
+  messages: Message[];
+
+  @OneToMany(() => Payment, (p) => p.payer)
+  payments: Payment[];
 }

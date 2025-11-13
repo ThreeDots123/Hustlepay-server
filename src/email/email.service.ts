@@ -120,11 +120,11 @@ export class EmailService {
     email: string,
     subject: string,
   ) {
-    await this.sendTemplateEmail({
-      to: email,
-      subject,
-      htmlContent: verifyEmail(details.currentYear, details.otpCode),
-    });
+    // await this.sendTemplateEmail({
+    //   to: email,
+    //   subject,
+    //   htmlContent: verifyEmail(details.currentYear, details.otpCode),
+    // });
   }
 
   //   async passwordlessLogin(
