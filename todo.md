@@ -2,35 +2,44 @@
 
 ## 1. Core Setup
 
-- [ ] Initialize NestJS project with Postgres + TypeORM.
-- [ ] Configure dotenv and environment variables.
-- [ ] Add docker-compose for Postgres (local dev).
-- [ ] Setup TypeORM migrations.
-- [ ] Implement global pipes for validation/transform (class-validator, class-transformer).
-- [ ] Add JWT authentication & Passport.
-- [ ] Configure logging and error handling middleware.
+- [x] Initialize NestJS project with Postgres + TypeORM.
+- [x] Configure dotenv and environment variables.
+- [x] Setup TypeORM migrations.
+- [x] Implement global pipes for validation/transform (class-validator, class-transformer).
+- [x] Add JWT authentication & Passport.
+- [x] Configure logging and error handling middleware.
 
 ## 2. Authentication & User Management
 
-- [ ] Implement User entity (common fields: id, email, passwordHash, role).
-- [ ] Roles: CLIENT, FREELANCER, ADMIN.
-- [ ] Register (signup) endpoint:
-  - [ ] Client registration (basic profile).
-  - [ ] Freelancer registration (profile + skills).
-- [ ] Login endpoint (JWT issue).
-- [ ] Password hashing with bcrypt.
-- [ ] JWT Guard & Role Guard for protected routes.
-- [ ] User profile update (name, bio, skills, etc).
-- [ ] Email verification flow (optional MVP: skip).
+- [x] Implement User entity (common fields: id, email, passwordHash, role).
+- [x] Roles: CLIENT, FREELANCER, ADMIN.
+- [x] Register (signup) endpoint:
+  - [x] Client registration (basic profile).
+  - [x] Freelancer registration (profile + skills).
+- [x] Login endpoint (JWT issue).
+- [x] Password hashing with bcrypt.
+- [x] JWT Guard & Role Guard for protected routes.
+- [ ] Password reset (Add emailing template)
+- [x] User profile update (name, bio, skills, etc).
+- [x] Email verification flow (optional MVP: skip).
+- [x] User status may be required later?
+  - [ ] Add to dto user response (Not decided yet)
+- [x] Catch email already exists
+- [x] Event to manage user registeration workflow - FIX - ENUM DTO FOR USER ROLE ON USER CREATION
+
+- [ ] Add Avatar url and rating to freelancers
 
 ## 3. Freelancer Side
 
-- [ ] Gig entity (title, description, category, price, ownerId).
+- [x] Gig entity (title, description, category, price, ownerId).
 - [ ] CRUD for gigs:
-  - [ ] Create gig.
-  - [ ] Update gig.
-  - [ ] Delete gig.
-  - [ ] Get freelancer’s gigs.
+  - [x] Create gig.
+  - [x] Retrieve single gig.
+  - [x] Retrieve all gigs (Add pagination).
+  - [ ] Retrieve all gigs (Search filtering).
+  - [ ] Update gig. (Update packages and media)
+  - [x] Delete gig.
+  - [ ] Get freelancer’s gigs. (From Client POV?)
 - [ ] View orders assigned to freelancer.
 - [ ] Submit deliverables for orders.
 - [ ] Earnings tracking (wallet balance).
@@ -115,3 +124,8 @@
 - [ ] Advanced search/filter for gigs & freelancers.
 - [ ] Recommendation system (AI/ML).
 - [ ] Escrow automation with smart contracts (if blockchain integrated).
+
+# Tell Dave
+
+- Open Mailjet for emailing
+- Open Cloudinary for saving mdia

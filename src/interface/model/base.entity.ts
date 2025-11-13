@@ -5,7 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { resolveDbType } from '../../utils/db-parse-column';
+import { resolveDbType } from 'src/utils/db-parse-column';
 import generateEntityId from 'src/utils/generate-entity-id';
 
 /**
