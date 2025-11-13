@@ -79,7 +79,10 @@ export class TokenService extends BaseService {
       return { isValid: false, message: "Invalid or expired OTP" };
 
     if (otp.isMaxAttemptsReached())
-      return { isValid: false, message: "Maximum attempts reached" };
+      return {
+        isValid: false,
+        message: "Maximum attempts reached. Generate a new otp.",
+      };
 
     otp.incrementAttempts();
 

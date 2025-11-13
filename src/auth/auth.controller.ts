@@ -103,6 +103,10 @@ export class AuthController {
 
   @Post("login")
   async login(@Body() _body: { email: string; password: string }) {
-    return this.authService.login(_body.email, _body.password);
+    const result = await this.authService.login(_body.email, _body.password);
+    return {
+      ...result,
+      user: transformToAuthenticatedUser(result.user),
+    };
   }
 }

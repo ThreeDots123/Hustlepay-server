@@ -69,7 +69,7 @@ export class AuthService {
       where: { email },
     });
 
-    if (!user) throw new UnauthorizedException("Invalid credential");
+    if (!user) throw new UnauthorizedException("Invalid Email or Password.");
 
     if (
       user &&
@@ -81,6 +81,7 @@ export class AuthService {
 
       return {
         access_token: this.jwtService.sign(payload),
+        user,
       };
     }
 
