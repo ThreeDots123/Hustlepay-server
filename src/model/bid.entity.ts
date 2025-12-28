@@ -11,6 +11,18 @@ export enum BidStatus {
   REJECTED = "rejected",
 }
 
+export enum BidRateType {
+  FIXED = "fixed",
+  HOURLY = "hourly",
+  PROJECT = "project",
+}
+
+export enum BidExperienceLevel {
+  ENTRY = "entry",
+  INTERMEDIATE = "intermediate",
+  EXPERT = "expert",
+}
+
 @Entity({ name: "bid" })
 export class Bid extends BaseEntity {
   protected id_prefix = "bid";
@@ -35,14 +47,50 @@ export class Bid extends BaseEntity {
   @JoinColumn({ name: "proposal_id" })
   proposal: Proposal;
 
+  @Column({ type: "varchar", length: 255, nullable: false })
+  title: string;
+
   @Column("text")
   coverLetter: string;
 
-  @Column({ type: "int", nullable: true })
-  proposedBudget?: number;
+  @Column({ type: "int", nullable: false })
+  proposedBudget: number;
 
-  @Column({ type: "int", nullable: true })
-  proposedDurationDays?: number;
+  @DbAwareColumn({
+    type: "enum",
+    enum: BidRateType,
+    nullable: false,
+    default: BidRateType.FIXED,
+    name: "rate_type",
+  })
+  rateType: BidRateType;
+
+  @Column({ type: "int", nullable: false })
+  proposedDurationDays: number;
+
+  @DbAwareColumn({
+    type: "enum",
+    enum: BidExperienceLevel,
+    nullable: true,
+    name: "experience_level",
+  })
+  experience?: BidExperienceLevel;
+
+  @Column({ type: "varchar", length: 500, nullable: true })
+  portfolio?: string; // Portfolio/website URL
+
+  @DbAwareColumn({
+    type: "jsonb",
+    nullable: true,
+    name: "attachments",
+  })
+  attachments?: Array<{
+    id: string;
+    name: string;
+    type: "image" | "video" | "document" | "other";
+    size: number;
+    url: string; // URL to the uploaded file
+  }>;
 
   @DbAwareColumn({
     type: "enum",

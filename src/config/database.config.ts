@@ -26,7 +26,7 @@ export default function databaseConfig(
 
     migrations: ["dist/migrations/*.js"],
 
-    ...(configService.getOrThrow<string>(NODE_ENV) === "production" && {
+    ...(configService.get<string>(NODE_ENV) === "production" && {
       ssl: {
         rejectUnauthorized: false, // This will allow self-signed certificates
       },

@@ -6,10 +6,11 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Bid, BidStatus } from "../model/bid.entity";
+import { Bid, BidStatus, BidRateType } from "../model/bid.entity";
 import { Proposal, ProposalStatus } from "../model/proposal.entity";
 import { User } from "../model/user.entity";
-import { CreateBidDto } from "./dto/create-bid.dto";
+import { CreateBidDto, AttachmentMetadata } from "./dto/create-bid.dto";
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
 
 @Injectable()
 export class BidService {
@@ -17,9 +18,15 @@ export class BidService {
     @InjectRepository(Bid) private readonly bidRepo: Repository<Bid>,
     @InjectRepository(Proposal)
     private readonly proposalRepo: Repository<Proposal>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(freelancerId: string, proposalId: string, dto: CreateBidDto) {
+  async create(
+    freelancerId: string,
+    proposalId: string,
+    dto: CreateBidDto,
+    files: Express.Multer.File[] = [],
+  ) {
     const proposal = await this.proposalRepo.findOne({
       where: { id: proposalId },
     });
@@ -27,12 +34,51 @@ export class BidService {
     if (proposal.status !== "open")
       throw new BadRequestException("Proposal not open");
 
+    // Upload files to Cloudinary if any
+    let attachments: AttachmentMetadata[] | undefined;
+    if (files && files.length > 0) {
+      const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+        files,
+        `bids/${proposalId}`,
+      );
+
+      attachments = uploadResults.map((result, index) => {
+        const file = files[index];
+        const getFileType = (
+          mimeType: string,
+        ): "image" | "video" | "document" | "other" => {
+          if (mimeType.startsWith("image/")) return "image";
+          if (mimeType.startsWith("video/")) return "video";
+          if (
+            mimeType.includes("pdf") ||
+            mimeType.includes("document") ||
+            mimeType.includes("word")
+          )
+            return "document";
+          return "other";
+        };
+
+        return {
+          id: result.public_id,
+          name: file.originalname,
+          type: getFileType(file.mimetype),
+          size: result.bytes,
+          url: result.secure_url,
+        };
+      });
+    }
+
     const bid = this.bidRepo.create({
       freelancerId,
       proposalId,
+      title: dto.title,
       coverLetter: dto.coverLetter,
       proposedBudget: dto.proposedBudget,
+      rateType: dto.rateType || BidRateType.FIXED,
       proposedDurationDays: dto.proposedDurationDays,
+      experience: dto.experience,
+      portfolio: dto.portfolio,
+      attachments,
     });
     return this.bidRepo.save(bid);
   }
@@ -111,5 +157,17 @@ export class BidService {
     bid.proposal.status = ProposalStatus.HIRED;
     await this.proposalRepo.save(bid.proposal);
     return bid;
+  }
+
+  // ✅ Get all active bids for a client (bids that haven't been accepted)
+  async findActiveBidsForClient(clientId: string) {
+    return this.bidRepo.find({
+      where: {
+        proposal: { clientId },
+        status: BidStatus.PENDING,
+      },
+      relations: ["proposal", "freelancer"],
+      order: { createdAt: "DESC" },
+    });
   }
 }

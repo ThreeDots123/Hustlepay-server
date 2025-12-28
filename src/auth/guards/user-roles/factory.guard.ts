@@ -27,7 +27,7 @@ export abstract class UserRoleGuard extends JwtAuthGuard {
       if (this.role === userRole) return true;
 
       throw new UnauthorizedException(
-        "User does not have the appropriate role for this route. Expected ro;e of " +
+        "User does not have the appropriate role for this route. Expected role of " +
           this.role,
       );
     }

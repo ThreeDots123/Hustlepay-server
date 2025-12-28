@@ -1,0 +1,2430 @@
+[
+  {
+    "id": "prop_01KAZ0N4QJ9M1T2H8V0X4R5Y6Z",
+    "createdAt": "2025-11-05T09:12:34.000Z",
+    "updatedAt": "2025-11-05T09:12:34.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Build a Landing Page",
+    "description": "I need a React landing page with animations.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "I need a React landing page with animations.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 250,
+    "budgetMax": 250,
+    "currency": "ngn",
+    "durationEstimateDays": 7,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_tailwind_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "TailwindCSS",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "build-a-landing-page-1a2b3c",
+    "categories": [
+      "animations",
+      "frontend",
+      "landing page",
+      "react",
+      "tailwindcss",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ1A7R3G5P9L2D4Q6S7T8U",
+    "createdAt": "2025-11-05T10:22:11.000Z",
+    "updatedAt": "2025-11-05T10:22:11.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "E-commerce Product Page",
+    "description": "Create a responsive product page in React with cart interactions.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Create a responsive product page in React with cart interactions.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 400,
+    "budgetMax": 450,
+    "currency": "ngn",
+    "durationEstimateDays": 14,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_node_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Node.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "e-commerce-product-page-4f5g6h",
+    "categories": ["frontend", "node.js", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZ2B8V6H4Q3N9J0M1R2S3T",
+    "createdAt": "2025-11-05T11:45:00.000Z",
+    "updatedAt": "2025-11-05T11:45:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page with CMS Integration",
+    "description": "Build a landing page in Next.js and connect to a headless CMS.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Build a landing page in Next.js and connect to a headless CMS.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 600,
+    "budgetMax": 700,
+    "currency": "ngn",
+    "durationEstimateDays": 21,
+    "skills": [
+      {
+        "id": "skc_next_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Next.js",
+        "category": null
+      },
+      {
+        "id": "skc_cms_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Headless CMS",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "landing-page-with-cms-7y8z9x",
+    "categories": [
+      "cms",
+      "frontend",
+      "headless cms",
+      "landing page",
+      "next.js",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ3C9Y7J5R4O2K1L3M4N5P",
+    "createdAt": "2025-11-05T13:10:42.000Z",
+    "updatedAt": "2025-11-05T13:10:42.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Redesign Homepage UI",
+    "description": "Redesign an existing homepage to improve conversion and performance.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Redesign an existing homepage to improve conversion and performance.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 350,
+    "budgetMax": 450,
+    "currency": "ngn",
+    "durationEstimateDays": 14,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_figma_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Figma",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "redesign-homepage-ui-2b4c6d",
+    "categories": [
+      "conversion optimization",
+      "figma",
+      "frontend",
+      "react",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ4D0Z8K6S5P3L2M4N5O6Q",
+    "createdAt": "2025-11-06T08:05:18.000Z",
+    "updatedAt": "2025-11-06T08:05:18.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Single Page App for Events",
+    "description": "Develop a single page application for event listings and registration.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Develop a single page application for event listings and registration.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 800,
+    "budgetMax": 900,
+    "currency": "ngn",
+    "durationEstimateDays": 30,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_graphql_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "GraphQL",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "single-page-app-events-5h7j9k",
+    "categories": ["frontend", "graphql", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZ5E1A9L7T6Q4M3N5O6P7R",
+    "createdAt": "2025-11-06T10:21:00.000Z",
+    "updatedAt": "2025-11-06T10:21:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Marketing Landing Page",
+    "description": "Create a marketing landing page optimized for conversion and SEO.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Create a marketing landing page optimized for conversion and SEO.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 200,
+    "budgetMax": 300,
+    "currency": "ngn",
+    "durationEstimateDays": 5,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_seo_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "SEO",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "marketing-landing-page-3m4n5o",
+    "categories": [
+      "conversion optimization",
+      "frontend",
+      "landing page",
+      "react",
+      "seo",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ6F2B0M8U7R5N4O6P7Q8S",
+    "createdAt": "2025-11-06T12:33:19.000Z",
+    "updatedAt": "2025-11-06T12:33:19.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page A/B Testing Setup",
+    "description": "Implement A/B testing and analytics for a landing page to optimize conversions.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Implement A/B testing and analytics for a landing page to optimize conversions.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 500,
+    "budgetMax": 600,
+    "currency": "ngn",
+    "durationEstimateDays": 12,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_analytics_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Analytics",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "ab-testing-landing-9a8b7c",
+    "categories": [
+      "analytics",
+      "conversion optimization",
+      "frontend",
+      "landing page",
+      "react",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ7G3C1N9V8S6O5P7Q8R9T",
+    "createdAt": "2025-11-07T09:15:00.000Z",
+    "updatedAt": "2025-11-07T09:15:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "SPA Dashboard UI",
+    "description": "Design and implement a single page dashboard with charts and filters.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Design and implement a single page dashboard with charts and filters.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 900,
+    "budgetMax": 1000,
+    "currency": "ngn",
+    "durationEstimateDays": 28,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_d3_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "D3.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "spa-dashboard-ui-6v5w4x",
+    "categories": [
+      "analytics",
+      "d3.js",
+      "dashboard",
+      "data visualization",
+      "frontend",
+      "react",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZ8H4D2P0W9T7Q6R8S9U0V",
+    "createdAt": "2025-11-07T11:40:30.000Z",
+    "updatedAt": "2025-11-07T11:40:30.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Static Marketing Site",
+    "description": "Build a static marketing site with multi-page routing and performance optimizations.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Build a static marketing site with multi-page routing and performance optimizations.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 300,
+    "budgetMax": 350,
+    "currency": "ngn",
+    "durationEstimateDays": 10,
+    "skills": [
+      {
+        "id": "skc_next_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Next.js",
+        "category": null
+      },
+      {
+        "id": "skc_seo_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "SEO",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "static-marketing-site-8z7y6x",
+    "categories": ["frontend", "next.js", "seo", "web development"]
+  },
+  {
+    "id": "prop_01KAZ9I5E3Q1X0U8R7S9T0V1W",
+    "createdAt": "2025-11-08T07:55:12.000Z",
+    "updatedAt": "2025-11-08T07:55:12.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Responsive Email Template",
+    "description": "Design and code a responsive newsletter email template compatible with major clients.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Design and code a responsive newsletter email template compatible with major clients.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 150,
+    "budgetMax": 200,
+    "currency": "ngn",
+    "durationEstimateDays": 3,
+    "skills": [
+      {
+        "id": "skc_html_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "HTML/CSS",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "responsive-email-template-2d3f4g",
+    "categories": ["email template", "frontend", "html/css", "web development"]
+  },
+  {
+    "id": "prop_01KAZAJ6F4R2Y1V9S8T0U1V2X",
+    "createdAt": "2025-11-08T09:30:45.000Z",
+    "updatedAt": "2025-11-08T09:30:45.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Micro-interactions for Landing",
+    "description": "Add micro-interactions and subtle animations to improve UX on the landing page.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Add micro-interactions and subtle animations to improve UX on the landing page.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 180,
+    "budgetMax": 220,
+    "currency": "ngn",
+    "durationEstimateDays": 4,
+    "skills": [
+      {
+        "id": "skc_frmotion_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Framer Motion",
+        "category": null
+      },
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "micro-interactions-1q2w3e",
+    "categories": [
+      "animations",
+      "framer motion",
+      "frontend",
+      "landing page",
+      "react",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZBK7G5S3Z2W0T9U1V2W3Y",
+    "createdAt": "2025-11-09T08:05:00.000Z",
+    "updatedAt": "2025-11-09T08:05:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Convert Design to React Components",
+    "description": "Translate Figma designs into reusable React components with documentation.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Translate Figma designs into reusable React components with documentation.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 450,
+    "budgetMax": 550,
+    "currency": "ngn",
+    "durationEstimateDays": 18,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_figma_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Figma",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "convert-design-to-react-7r8t9y",
+    "categories": ["figma", "frontend", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZCL8H6T4A3X1U0V2W3X4Z",
+    "createdAt": "2025-11-09T10:12:22.000Z",
+    "updatedAt": "2025-11-09T10:12:22.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Speed Optimization for Landing",
+    "description": "Improve Lighthouse score and overall performance for our landing page.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Improve Lighthouse score and overall performance for our landing page.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 220,
+    "budgetMax": 300,
+    "currency": "ngn",
+    "durationEstimateDays": 7,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_performance_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Performance",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "speed-optimization-4g5h6j",
+    "categories": [
+      "frontend",
+      "landing page",
+      "performance",
+      "react",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZDM9I7U5B4Y2V1W3X4Y5A",
+    "createdAt": "2025-11-10T08:00:00.000Z",
+    "updatedAt": "2025-11-10T08:00:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Integrate Payment Gateway",
+    "description": "Integrate Stripe/Paystack checkout on the landing page for payments.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Integrate Stripe/Paystack checkout on the landing page for payments.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 700,
+    "budgetMax": 800,
+    "currency": "ngn",
+    "durationEstimateDays": 15,
+    "skills": [
+      {
+        "id": "skc_node_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Node.js",
+        "category": null
+      },
+      {
+        "id": "skc_payments_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Payments",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "integrate-payments-0p9o8i",
+    "categories": ["frontend", "node.js", "payments", "web development"]
+  },
+  {
+    "id": "prop_01KAZEN0J8V6C5Z3W2X4Y5Z6B",
+    "createdAt": "2025-11-10T11:22:00.000Z",
+    "updatedAt": "2025-11-10T11:22:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "CMS-driven Landing Page",
+    "description": "Landing page that editors can update via a CMS dashboard.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Landing page that editors can update via a CMS dashboard.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 550,
+    "budgetMax": 600,
+    "currency": "ngn",
+    "durationEstimateDays": 16,
+    "skills": [
+      {
+        "id": "skc_next_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Next.js",
+        "category": null
+      },
+      {
+        "id": "skc_cms_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Headless CMS",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "cms-driven-landing-3c2b1a",
+    "categories": [
+      "cms",
+      "frontend",
+      "headless cms",
+      "landing page",
+      "next.js",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZFO1K9W7D6A4X3Y5Z6A7C",
+    "createdAt": "2025-11-11T08:40:00.000Z",
+    "updatedAt": "2025-11-11T08:40:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Newsletter Signup Integration",
+    "description": "Add newsletter signup with double opt-in to the landing page.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Add newsletter signup with double opt-in to the landing page.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 120,
+    "budgetMax": 180,
+    "currency": "ngn",
+    "durationEstimateDays": 3,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_marketing_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Marketing",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "newsletter-signup-5t6y7u",
+    "categories": ["frontend", "marketing", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZGP2L0X8E7B5Y4Z6A7B8D",
+    "createdAt": "2025-11-11T10:05:00.000Z",
+    "updatedAt": "2025-11-11T10:05:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page Accessibility Audit",
+    "description": "Perform accessibility audit and fix issues to meet WCAG 2.1 AA standards.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Perform accessibility audit and fix issues to meet WCAG 2.1 AA standards.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 280,
+    "budgetMax": 350,
+    "currency": "ngn",
+    "durationEstimateDays": 8,
+    "skills": [
+      {
+        "id": "skc_accessibility_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Accessibility",
+        "category": null
+      },
+      {
+        "id": "skc_performance_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Performance",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "accessibility-audit-9n8m7b",
+    "categories": [
+      "accessibility",
+      "audit",
+      "frontend",
+      "landing page",
+      "performance",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZHQ3M1Y9F8C6Z5A7B8C9E",
+    "createdAt": "2025-11-12T08:50:00.000Z",
+    "updatedAt": "2025-11-12T08:50:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Progressive Web App Landing",
+    "description": "Convert landing page into a Progressive Web App with offline caching.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Convert landing page into a Progressive Web App with offline caching.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 650,
+    "budgetMax": 750,
+    "currency": "ngn",
+    "durationEstimateDays": 20,
+    "skills": [
+      {
+        "id": "skc_pwa_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "PWA",
+        "category": null
+      },
+      {
+        "id": "skc_serviceworker_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Service Worker",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "pwa-landing-2k3l4m",
+    "categories": [
+      "frontend",
+      "landing page",
+      "pwa",
+      "service worker",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZIR4N2Z0G9D7A6B8C9D0F",
+    "createdAt": "2025-11-12T11:15:00.000Z",
+    "updatedAt": "2025-11-12T11:15:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Internationalization Setup",
+    "description": "Add i18n support to our landing page (EN + FR + ES).",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Add i18n support to our landing page (EN + FR + ES).",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 300,
+    "budgetMax": 350,
+    "currency": "ngn",
+    "durationEstimateDays": 9,
+    "skills": [
+      {
+        "id": "skc_i18n_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "i18n",
+        "category": null
+      },
+      {
+        "id": "skc_next_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Next.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "i18n-setup-5b6c7d",
+    "categories": ["frontend", "i18n", "next.js", "web development"]
+  },
+  {
+    "id": "prop_01KAZJS5O3A1H0E8B7C9D0E1G",
+    "createdAt": "2025-11-12T13:40:00.000Z",
+    "updatedAt": "2025-11-12T13:40:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Custom Form Builder",
+    "description": "Implement a custom form builder and integrate it into the landing page.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Implement a custom form builder and integrate it into the landing page.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 480,
+    "budgetMax": 520,
+    "currency": "ngn",
+    "durationEstimateDays": 16,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_forms_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Forms",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "custom-form-builder-8e9f0g",
+    "categories": ["forms", "frontend", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZKT6P4B2I1F9C8D0E1F2H",
+    "createdAt": "2025-11-13T08:05:00.000Z",
+    "updatedAt": "2025-11-13T08:05:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Interactive Testimonials Slider",
+    "description": "Add an interactive testimonials slider with autoplay and controls.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Add an interactive testimonials slider with autoplay and controls.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 130,
+    "budgetMax": 180,
+    "currency": "ngn",
+    "durationEstimateDays": 4,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      },
+      {
+        "id": "skc_swiper_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Swiper",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "testimonials-slider-1h2j3k",
+    "categories": [
+      "frontend",
+      "react",
+      "swiper",
+      "ui component",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZLU7Q5C3J2G0D9E1F2G3I",
+    "createdAt": "2025-11-13T10:30:00.000Z",
+    "updatedAt": "2025-11-13T10:30:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Animated Hero Section",
+    "description": "Create an animated hero section using subtle motion and lazy-loading media.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Create an animated hero section using subtle motion and lazy-loading media.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 210,
+    "budgetMax": 260,
+    "currency": "ngn",
+    "durationEstimateDays": 6,
+    "skills": [
+      {
+        "id": "skc_frmotion_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Framer Motion",
+        "category": null
+      },
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "animated-hero-4r5t6y",
+    "categories": [
+      "animations",
+      "framer motion",
+      "frontend",
+      "react",
+      "ui/ux",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZMV8R6D4K3H1E0F2G3H4J",
+    "createdAt": "2025-11-13T12:45:00.000Z",
+    "updatedAt": "2025-11-13T12:45:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page Localization",
+    "description": "Localize content and currency display for multiple regions.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Localize content and currency display for multiple regions.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 280,
+    "budgetMax": 340,
+    "currency": "ngn",
+    "durationEstimateDays": 10,
+    "skills": [
+      {
+        "id": "skc_i18n_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "i18n",
+        "category": null
+      },
+      {
+        "id": "skc_currency_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Currency Formatting",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "localization-9z8x7c",
+    "categories": [
+      "currency formatting",
+      "frontend",
+      "i18n",
+      "landing page",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZNW9S7E5L4I2F1G3H4I5K",
+    "createdAt": "2025-11-13T14:55:00.000Z",
+    "updatedAt": "2025-11-13T14:55:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page Security Review",
+    "description": "Security review and fixes for XSS, CSP and secure headers on the landing page.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Security review and fixes for XSS, CSP and secure headers on the landing page.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 320,
+    "budgetMax": 380,
+    "currency": "ngn",
+    "durationEstimateDays": 9,
+    "skills": [
+      {
+        "id": "skc_security_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Security",
+        "category": null
+      },
+      {
+        "id": "skc_node_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Node.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "security-review-2v4b6n",
+    "categories": [
+      "frontend",
+      "landing page",
+      "node.js",
+      "security",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZOX0T8F6M5J3G2H4I5J6L",
+    "createdAt": "2025-11-13T16:10:00.000Z",
+    "updatedAt": "2025-11-13T16:10:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "A11y Text Alternatives Update",
+    "description": "Audit images and provide accessible text alternatives and ARIA labels.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Audit images and provide accessible text alternatives and ARIA labels.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 140,
+    "budgetMax": 180,
+    "currency": "ngn",
+    "durationEstimateDays": 2,
+    "skills": [
+      {
+        "id": "skc_accessibility_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Accessibility",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "a11y-text-1s2d3f",
+    "categories": ["accessibility", "audit", "frontend", "web development"]
+  },
+  {
+    "id": "prop_01KAZPY1U9G7N6K4H3I5J6K7M",
+    "createdAt": "2025-11-13T17:35:00.000Z",
+    "updatedAt": "2025-11-13T17:35:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "SEO Audit and Fixes",
+    "description": "Perform SEO audit and implement fixes to headings, metadata and structured data.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Perform SEO audit and implement fixes to headings, metadata and structured data.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 260,
+    "budgetMax": 320,
+    "currency": "ngn",
+    "durationEstimateDays": 6,
+    "skills": [
+      {
+        "id": "skc_seo_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "SEO",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "seo-audit-6t5r4e",
+    "categories": ["audit", "frontend", "marketing", "seo", "web development"]
+  },
+  {
+    "id": "prop_01KAZQZ2V0H8O7L5I4J6K7L8N",
+    "createdAt": "2025-11-13T18:50:00.000Z",
+    "updatedAt": "2025-11-13T18:50:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Landing Page Analytics Dashboard",
+    "description": "Create a dashboard to visualize landing page metrics (sessions, conversions).",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Create a dashboard to visualize landing page metrics (sessions, conversions).",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 720,
+    "budgetMax": 780,
+    "currency": "ngn",
+    "durationEstimateDays": 22,
+    "skills": [
+      {
+        "id": "skc_analytics_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Analytics",
+        "category": null
+      },
+      {
+        "id": "skc_d3_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "D3.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "analytics-dashboard-0x1y2z",
+    "categories": [
+      "analytics",
+      "conversion optimization",
+      "d3.js",
+      "dashboard",
+      "frontend",
+      "landing page",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZR01W1I9P8M6J5K7L8M9O",
+    "createdAt": "2025-11-13T19:55:00.000Z",
+    "updatedAt": "2025-11-13T19:55:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Headless CMS Migration",
+    "description": "Migrate content to a headless CMS and connect the landing page to it.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Migrate content to a headless CMS and connect the landing page to it.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 880,
+    "budgetMax": 950,
+    "currency": "ngn",
+    "durationEstimateDays": 24,
+    "skills": [
+      {
+        "id": "skc_cms_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Headless CMS",
+        "category": null
+      },
+      {
+        "id": "skc_next_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Next.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "headless-migration-7u8i9o",
+    "categories": [
+      "cms",
+      "frontend",
+      "headless cms",
+      "next.js",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZS12X2J0Q9N7K6L8M9N0P",
+    "createdAt": "2025-11-13T20:30:00.000Z",
+    "updatedAt": "2025-11-13T20:30:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Custom Animation Library",
+    "description": "Create a small animation library for consistent transitions across the landing.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Create a small animation library for consistent transitions across the landing.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 420,
+    "budgetMax": 480,
+    "currency": "ngn",
+    "durationEstimateDays": 11,
+    "skills": [
+      {
+        "id": "skc_frmotion_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Framer Motion",
+        "category": null
+      },
+      {
+        "id": "skc_js_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "JavaScript",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "custom-animation-2p3o4i",
+    "categories": [
+      "animations",
+      "framer motion",
+      "frontend",
+      "javascript",
+      "ui/ux",
+      "web development"
+    ]
+  },
+  {
+    "id": "prop_01KAZT23Y3K1R0O8L7M9N0O1Q",
+    "createdAt": "2025-11-13T21:10:00.000Z",
+    "updatedAt": "2025-11-13T21:10:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Form Validation Improvements",
+    "description": "Improve validation UX and add server-side validation for landing page forms.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Improve validation UX and add server-side validation for landing page forms.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 160,
+    "budgetMax": 210,
+    "currency": "ngn",
+    "durationEstimateDays": 5,
+    "skills": [
+      {
+        "id": "skc_forms_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Forms",
+        "category": null
+      },
+      {
+        "id": "skc_node_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Node.js",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "form-validation-7g8h9j",
+    "categories": ["forms", "frontend", "node.js", "web development"]
+  },
+  {
+    "id": "prop_01KAZU34Z4L2S1P9M8N0O1P2R",
+    "createdAt": "2025-11-13T21:45:00.000Z",
+    "updatedAt": "2025-11-13T21:45:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Custom 404 Page",
+    "description": "Design and implement a custom 404 experience with helpful CTAs.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Design and implement a custom 404 experience with helpful CTAs.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 100,
+    "budgetMax": 140,
+    "currency": "ngn",
+    "durationEstimateDays": 2,
+    "skills": [
+      {
+        "id": "skc_react_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "React",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "custom-404-9k8j7h",
+    "categories": ["frontend", "react", "web development"]
+  },
+  {
+    "id": "prop_01KAZV45A5M3T2Q0N9O1P2Q3S",
+    "createdAt": "2025-11-13T22:10:00.000Z",
+    "updatedAt": "2025-11-13T22:10:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "On-page Chat Widget",
+    "description": "Integrate a lightweight on-page chat widget for lead capture and support.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Integrate a lightweight on-page chat widget for lead capture and support.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 500,
+    "budgetMax": 600,
+    "currency": "ngn",
+    "durationEstimateDays": 12,
+    "skills": [
+      {
+        "id": "skc_node_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Node.js",
+        "category": null
+      },
+      {
+        "id": "skc_socket_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "WebSockets",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "chat-widget-4b3v2c",
+    "categories": ["frontend", "node.js", "web development", "websockets"]
+  },
+  {
+    "id": "prop_01KAZW56B6N4U3R1O0P2Q3R4T",
+    "createdAt": "2025-11-13T22:40:00.000Z",
+    "updatedAt": "2025-11-13T22:40:00.000Z",
+    "deletedAt": null,
+    "id_prefix": "prop",
+    "title": "Image Optimization Pipeline",
+    "description": "Setup an image pipeline with lazy loading, responsive sizes and CDNs.",
+    "descriptionTree": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "children": [
+              {
+                "mode": "normal",
+                "text": "Setup an image pipeline with lazy loading, responsive sizes and CDNs.",
+                "type": "text",
+                "style": "",
+                "detail": 0,
+                "format": 0,
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "textStyle": "",
+            "textFormat": 0
+          }
+        ],
+        "direction": null
+      }
+    },
+    "clientId": "usr_01K9ABSSQYNWSY0KGZP91J6CRW",
+    "budgetMin": 260,
+    "budgetMax": 320,
+    "currency": "ngn",
+    "durationEstimateDays": 7,
+    "skills": [
+      {
+        "id": "skc_performance_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "Performance",
+        "category": null
+      },
+      {
+        "id": "skc_cdn_01",
+        "createdAt": "2025-11-05T08:00:00.000Z",
+        "updatedAt": "2025-11-05T08:00:00.000Z",
+        "deletedAt": null,
+        "id_prefix": "skc",
+        "name": "CDN",
+        "category": null
+      }
+    ],
+    "status": "open",
+    "inviteOnly": false,
+    "coverImageUrl": null,
+    "viewCount": 0,
+    "slug": "image-pipeline-5n6m7b",
+    "categories": ["cdn", "frontend", "performance", "web development"]
+  }
+]

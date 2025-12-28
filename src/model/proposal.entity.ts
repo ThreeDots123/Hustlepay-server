@@ -13,6 +13,7 @@ import {
 import { User } from "./user.entity";
 import { Bid } from "./bid.entity";
 import { SkillCatalog } from "./skill-catalog.entity";
+import { CategoryCatalog } from "./category-catalog.entity";
 import { DbAwareColumn } from "src/utils/db-parse-column";
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
 import { slugify } from "transliteration";
@@ -63,6 +64,12 @@ export class Proposal extends SoftDeletableEntity {
   @ManyToMany(() => SkillCatalog, (skill) => skill.proposals, { cascade: true })
   @JoinTable({ name: "proposal_skills" })
   skills: SkillCatalog[];
+
+  @ManyToMany(() => CategoryCatalog, (category) => category.proposals, {
+    cascade: true,
+  })
+  @JoinTable({ name: "proposal_categories" })
+  categories: CategoryCatalog[];
 
   @OneToMany(() => Bid, (bid) => bid.proposal)
   bids: Bid[];

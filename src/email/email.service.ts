@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import * as Mailjet from "node-mailjet";
+import Mailjet from "node-mailjet";
 import userWelcomeMail from "./texts/welcome";
 // import passwordReset from './email-texts/password-reset';
 import verifyEmail from "./texts/verify-account";
