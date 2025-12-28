@@ -23,13 +23,39 @@ async function bootstrap() {
 
   // Setting up swagger docs tool
   const config = new DocumentBuilder()
-    .setTitle("Hustle pay")
-    .setDescription("A freelancing platform for Nigerians.")
+    .setTitle("Hustle Pay API")
+    .setDescription(
+      "A comprehensive freelancing platform API for Nigerians. This API enables clients to post proposals and freelancers to submit bids. Features include user authentication, profile management, proposal creation, bidding system, and contract management.",
+    )
     .setVersion("1.0")
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        name: "JWT",
+        description: "Enter JWT token",
+        in: "header",
+      },
+      "JWT-auth", // This name here is important for matching up with @ApiBearerAuth() in your controller!
+    )
+    .addTag("Authentication", "User authentication and email verification endpoints")
+    .addTag("Users", "User profile management and freelancer discovery endpoints")
+    .addTag("Proposals", "Proposal creation, management, and discovery endpoints")
+    .addTag("Bids", "Bid creation, management, and retrieval endpoints")
+    .addTag("Contracts", "Contract creation and management endpoints")
+    .addTag("Password", "Password reset and recovery endpoints")
+    .addTag("App", "Application health and general endpoints")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("docs", app, document);
+  SwaggerModule.setup("docs", app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: "alpha",
+      operationsSorter: "alpha",
+    },
+  });
 
   //* Register the response interceptor
   app.useGlobalInterceptors(new ResponseTransformerInterceptor());

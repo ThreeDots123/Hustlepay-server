@@ -15,6 +15,7 @@ import { TokenModule } from "./token/token.module";
 import { ProposalModule } from "./proposal/proposal.module";
 import { BidModule } from "./bid/bid.module";
 import { ContractModule } from './contract/contract.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ContractModule } from './contract/contract.module';
     ProposalModule,
     BidModule,
     ContractModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

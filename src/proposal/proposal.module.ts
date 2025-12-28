@@ -4,10 +4,15 @@ import { ProposalController } from "./proposal.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "src/user/user.module";
 import { SkillCatalog } from "src/model/skill-catalog.entity";
+import { CategoryCatalog } from "src/model/category-catalog.entity";
 import { Proposal } from "src/model/proposal.entity";
+import { Bid } from "src/model/bid.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Proposal, SkillCatalog]), UserModule],
+  imports: [
+    TypeOrmModule.forFeature([Proposal, SkillCatalog, CategoryCatalog, Bid]),
+    UserModule,
+  ],
   providers: [ProposalService],
   controllers: [ProposalController],
   exports: [ProposalService],

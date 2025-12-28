@@ -10,6 +10,8 @@ import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
 import { User as UserEntity } from "../model/user.entity";
 import { SkillCatalog as SkillCatalogEntity } from "../model/skill-catalog.entity";
+import { CategoryCatalog as CategoryCatalogEntity } from "../model/category-catalog.entity";
+import { Bid } from "src/model/bid.entity";
 
 @Injectable()
 export class ProposalService {
@@ -18,6 +20,9 @@ export class ProposalService {
     private readonly proposalRepo: Repository<Proposal>,
     @InjectRepository(SkillCatalogEntity)
     private readonly skillRepo: Repository<SkillCatalogEntity>,
+    @InjectRepository(CategoryCatalogEntity)
+    private readonly categoryRepo: Repository<CategoryCatalogEntity>,
+    @InjectRepository(Bid) private readonly bidRepo: Repository<Bid>,
   ) {}
 
   async create(clientId: string, dto: CreateProposalDto) {
@@ -33,6 +38,18 @@ export class ProposalService {
       }
     }
 
+    const categories: CategoryCatalogEntity[] = [];
+    if (dto.categories && dto.categories.length) {
+      for (const c of dto.categories) {
+        let category = await this.categoryRepo.findOne({ where: { name: c } });
+        if (!category) {
+          category = this.categoryRepo.create({ name: c });
+          await this.categoryRepo.save(category);
+        }
+        categories.push(category);
+      }
+    }
+
     const p = this.proposalRepo.create({
       title: dto.title,
       description: dto.description,
@@ -42,6 +59,7 @@ export class ProposalService {
       budgetMax: dto.budgetMax,
       durationEstimateDays: dto.durationEstimateDays,
       skills,
+      categories,
     });
 
     const savedProposal = await this.proposalRepo.save(p);
@@ -53,13 +71,22 @@ export class ProposalService {
     return savedProposal;
   }
 
-  async findOne(id: string) {
-    const p = await this.proposalRepo.findOne({
-      where: { id },
-      relations: ["client", "skills", "bids"],
-    });
-    if (!p) throw new NotFoundException("Proposal not found");
-    return p;
+  async findOne(
+    slug: string,
+    user: { freelancer: string } | { client: string },
+  ) {
+    if ("freelancer" in user) {
+      const p = await this.proposalRepo.findOne({
+        where: { slug },
+        relations: ["client", "skills", "categories", "bids"],
+      });
+      if (!p) throw new NotFoundException("Proposal not found");
+
+      const alreadyBidded = await this.bidRepo.exists({
+        where: { freelancerId: user.freelancer, proposalId: p.id },
+      });
+      return { proposal: p, alreadyBidded };
+    }
   }
 
   async findAll(
@@ -67,16 +94,34 @@ export class ProposalService {
       page = 1,
       limit = 20,
       skill,
+      skills,
+      budgetMin,
+      budgetMax,
+      durationMin,
+      durationMax,
+      inviteOnly,
+      categories,
+      query,
     }: {
       page?: number;
       limit?: number;
       skill?: string;
+      skills?: string[];
+      budgetMin?: number;
+      budgetMax?: number;
+      durationMin?: number;
+      durationMax?: number;
+      inviteOnly?: boolean;
+      categories?: string[];
+      query?: string;
     },
     clientId?: string,
   ) {
     const qb = this.proposalRepo
       .createQueryBuilder("p")
-      .leftJoinAndSelect("p.skills", "s");
+      .leftJoinAndSelect("p.skills", "s")
+      .leftJoinAndSelect("p.categories", "c")
+      .distinct(true);
 
     if (clientId) qb.andWhere("p.clientId = :clientId", { clientId });
     else {
@@ -85,7 +130,50 @@ export class ProposalService {
       qb.where("p.status != :status", { status: ProposalStatus.CLOSED });
     }
 
-    if (skill) qb.andWhere("s.slug = :skill", { skill });
+    // Search query - search in title, description, skills, and categories
+    if (query && query.trim()) {
+      qb.andWhere(
+        "(LOWER(p.title) LIKE LOWER(:query) OR LOWER(p.description) LIKE LOWER(:query) OR LOWER(s.name) LIKE LOWER(:query) OR LOWER(c.name) LIKE LOWER(:query))",
+        { query: `%${query.trim()}%` },
+      );
+    }
+
+    // Filter by skills (prioritize skills array over single skill)
+    if (skills && skills.length > 0) {
+      qb.andWhere("s.name IN (:...skills)", { skills });
+    } else if (skill) {
+      // Filter by single skill (for backward compatibility)
+      qb.andWhere("s.name = :skill", { skill });
+    }
+
+    // Filter by proposal categories
+    if (categories && categories.length > 0) {
+      qb.andWhere("c.name IN (:...categories)", { categories });
+    }
+
+    // Filter by budget range
+    if (budgetMin !== undefined && budgetMin !== null) {
+      qb.andWhere("p.budgetMin >= :budgetMin", { budgetMin });
+    }
+
+    if (budgetMax !== undefined && budgetMax !== null) {
+      qb.andWhere("p.budgetMax <= :budgetMax", { budgetMax });
+    }
+
+    // Filter by duration range
+    if (durationMin !== undefined && durationMin !== null) {
+      qb.andWhere("p.durationEstimateDays >= :durationMin", { durationMin });
+    }
+
+    if (durationMax !== undefined && durationMax !== null) {
+      qb.andWhere("p.durationEstimateDays <= :durationMax", { durationMax });
+    }
+
+    // Filter by invite only
+    if (inviteOnly !== undefined && inviteOnly !== null) {
+      qb.andWhere("p.inviteOnly = :inviteOnly", { inviteOnly });
+    }
+
     qb.orderBy("p.createdAt", "DESC")
       .skip((page - 1) * limit)
       .take(limit);
