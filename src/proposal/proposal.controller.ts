@@ -21,6 +21,7 @@ import {
 import { ProposalService } from "./proposal.service";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
+import { AcceptProposalDto } from "./dto/accept-proposal.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import { request, Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
@@ -423,6 +424,57 @@ export class ProposalController {
   ) {
     const { id } = request.user as AuthorisedRequest;
     return this.svc.findOne(slug, { freelancer: id });
+  }
+
+  @Post(":id/accept")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Accept a proposal directly",
+    description:
+      "Allows a freelancer to accept a proposal directly without submitting a bid. Creates a contract using the proposal's budget. Only freelancers can accept proposals.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Proposal ID to accept",
+    type: String,
+    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiBody({
+    type: AcceptProposalDto,
+    description:
+      "Contract creation data (amount optional, defaults to proposal budget)",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Proposal accepted and contract created successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Validation error or proposal cannot be accepted",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Proposal not found",
+  })
+  async acceptProposal(
+    @Param("id") proposalId: string,
+    @Body() dto: AcceptProposalDto,
+    @Req() request: Request,
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.userService.findSingleUser({
+      where: { id },
+    });
+    return this.svc.acceptProposal(user, proposalId, dto.amount, dto.currency);
   }
 
   @Patch(":id")

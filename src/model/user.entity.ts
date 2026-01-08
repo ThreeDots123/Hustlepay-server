@@ -7,6 +7,7 @@ import { Bid } from "./bid.entity";
 import { Contract } from "./contract.entity";
 import { Message } from "./message.entity";
 import { Payment } from "./payment.entity";
+import { FreelancerProfile } from "./freelancer-profile.entity";
 
 export enum UserRole {
   FREELANCER = "freelancer",
@@ -81,6 +82,9 @@ export class User extends SoftDeletableEntity {
 
   @OneToMany(() => Proposal, (proposal) => proposal.client)
   proposals: Proposal[];
+
+  @OneToOne(() => FreelancerProfile, (profile) => profile.user)
+  freelancerProfile: FreelancerProfile;
 
   @OneToMany(() => Bid, (bid) => bid.freelancer)
   bids: Bid[];

@@ -7,10 +7,11 @@ import { SkillCatalog } from "src/model/skill-catalog.entity";
 import { CategoryCatalog } from "src/model/category-catalog.entity";
 import { Proposal } from "src/model/proposal.entity";
 import { Bid } from "src/model/bid.entity";
+import { Contract } from "src/model/contract.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Proposal, SkillCatalog, CategoryCatalog, Bid]),
+    TypeOrmModule.forFeature([Proposal, SkillCatalog, CategoryCatalog, Bid, Contract]),
     UserModule,
   ],
   providers: [ProposalService],

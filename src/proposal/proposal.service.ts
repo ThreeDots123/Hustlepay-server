@@ -2,16 +2,18 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { ILike, Repository, EntityManager } from "typeorm";
 import { Proposal, ProposalStatus } from "../model/proposal.entity";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
 import { User as UserEntity } from "../model/user.entity";
 import { SkillCatalog as SkillCatalogEntity } from "../model/skill-catalog.entity";
 import { CategoryCatalog as CategoryCatalogEntity } from "../model/category-catalog.entity";
-import { Bid } from "src/model/bid.entity";
+import { Bid, BidRateType } from "src/model/bid.entity";
+import { Contract, ContractStatus } from "../model/contract.entity";
 
 @Injectable()
 export class ProposalService {
@@ -23,6 +25,9 @@ export class ProposalService {
     @InjectRepository(CategoryCatalogEntity)
     private readonly categoryRepo: Repository<CategoryCatalogEntity>,
     @InjectRepository(Bid) private readonly bidRepo: Repository<Bid>,
+    @InjectRepository(Contract)
+    private readonly contractRepo: Repository<Contract>,
+    private readonly manager: EntityManager,
   ) {}
 
   async create(clientId: string, dto: CreateProposalDto) {
@@ -87,6 +92,18 @@ export class ProposalService {
       });
       return { proposal: p, alreadyBidded };
     }
+
+    // Client case
+    if ("client" in user) {
+      const p = await this.proposalRepo.findOne({
+        where: { slug, clientId: user.client },
+        relations: ["client", "skills", "categories", "bids"],
+      });
+      if (!p) throw new NotFoundException("Proposal not found");
+      return p;
+    }
+
+    throw new ForbiddenException("Invalid user type");
   }
 
   async findAll(
@@ -209,6 +226,92 @@ export class ProposalService {
       where: { name: ILike(`%${query}%`) },
       take: limit,
       order: { name: "ASC" },
+    });
+  }
+
+  // ✅ Accept proposal directly (freelancer accepts without bidding)
+  async acceptProposal(
+    freelancer: UserEntity,
+    proposalId: string,
+    contractAmount?: number,
+    currency?: string,
+  ) {
+    return this.manager.transaction(async (transactionalManager) => {
+      // Find proposal with client relation
+      const proposal = await transactionalManager.findOne(Proposal, {
+        where: { id: proposalId },
+        relations: ["client"],
+      });
+
+      if (!proposal) throw new NotFoundException("Proposal not found");
+
+      if (proposal.status === ProposalStatus.HIRED)
+        throw new BadRequestException("Proposal has already been hired");
+
+      if (proposal.status !== ProposalStatus.OPEN)
+        throw new BadRequestException("Proposal must be open to accept");
+
+      // Determine contract amount
+      let finalAmount: number;
+      if (contractAmount !== undefined && contractAmount !== null) {
+        finalAmount = contractAmount;
+        // Validate amount is within budget range if range exists
+        if (proposal.budgetMin && proposal.budgetMax) {
+          if (
+            finalAmount < proposal.budgetMin ||
+            finalAmount > proposal.budgetMax
+          ) {
+            throw new BadRequestException(
+              `Contract amount must be between ${proposal.budgetMin} and ${proposal.budgetMax}`,
+            );
+          }
+        } else if (proposal.budgetMin && finalAmount < proposal.budgetMin) {
+          throw new BadRequestException(
+            `Contract amount must be at least ${proposal.budgetMin}`,
+          );
+        } else if (proposal.budgetMax && finalAmount > proposal.budgetMax) {
+          throw new BadRequestException(
+            `Contract amount must be at most ${proposal.budgetMax}`,
+          );
+        }
+      } else {
+        // Use proposal's budget
+        if (proposal.budgetMin === proposal.budgetMax && proposal.budgetMin) {
+          finalAmount = proposal.budgetMin;
+        } else if (proposal.budgetMin) {
+          finalAmount = proposal.budgetMin;
+        } else if (proposal.budgetMax) {
+          finalAmount = proposal.budgetMax;
+        } else {
+          throw new BadRequestException(
+            "Proposal must have a budget to accept directly",
+          );
+        }
+      }
+
+      // Determine currency
+      const finalCurrency = currency || proposal.currency || "ngn";
+
+      // Create contract with proposal details (duration, default rateType)
+      // Status is PENDING_CLIENT_APPROVAL - client needs to approve before payment
+      const contract = transactionalManager.create(Contract, {
+        proposal,
+        // No bid reference since this is direct acceptance
+        client: proposal.client,
+        freelancer,
+        amount: finalAmount,
+        currency: finalCurrency,
+        durationDays: proposal.durationEstimateDays, // From proposal
+        rateType: BidRateType.FIXED, // Default to FIXED for direct acceptance
+        status: ContractStatus.PENDING_CLIENT_APPROVAL,
+      });
+      const savedContract = await transactionalManager.save(contract);
+
+      // Don't mark proposal as HIRED yet - client needs to approve
+      // Proposal remains OPEN so other freelancers can also accept
+      // Only mark as HIRED when client approves a contract
+
+      return savedContract;
     });
   }
 }

@@ -11,6 +11,11 @@ import {
   UseInterceptors,
   UploadedFile,
   Param,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  ParseFilePipe,
+  UploadedFiles,
+  Patch,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -22,7 +27,7 @@ import {
   ApiConsumes,
   ApiBody,
 } from "@nestjs/swagger";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { UsersService } from "./user.service";
 import { ProfileService } from "src/profile/profile.service";
@@ -34,6 +39,8 @@ import { UpdateFreelancerProfileDto } from "src/profile/dto/update-freelancer-pr
 import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import transformToAuthenticatedUser from "src/transformers/authenticated-user";
+import { BidService } from "src/bid/bid.service";
+import { UpdateBidDto } from "src/bid/dto/update-bid.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -41,6 +48,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private profileService: ProfileService,
+    private bidService: BidService,
   ) {}
 
   @UseGuards(IsFreelancerGuard)
@@ -459,5 +467,140 @@ export class UsersController {
   async getFreelancerProfileById(@Param("id") id: string) {
     const profile = await this.profileService.getFreelancerProfileById(id);
     return transformUserProfile(profile);
+  }
+
+  @Get("my-bids")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get all bids for freelancer",
+    description:
+      "Retrieves all bids submitted by the authenticated freelancer, including proposal details.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "List of bids retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getMyBids(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.bidService.findByFreelancer(id);
+  }
+
+  @Patch("bids/:id")
+  @UseGuards(IsFreelancerGuard)
+  @UseInterceptors(FilesInterceptor("attachments", 10))
+  @ApiBearerAuth("JWT-auth")
+  @ApiConsumes("multipart/form-data")
+  @ApiOperation({
+    summary: "Update a bid",
+    description:
+      "Updates an existing bid. Only the bid owner (freelancer) can update it. Only pending bids can be updated. All fields are optional.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Bid ID",
+    type: String,
+    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          example: "Professional Web Development Service",
+          description: "Bid title",
+        },
+        coverLetter: {
+          type: "string",
+          example: "I have extensive experience in web development...",
+          description: "Cover letter (min 50 characters)",
+        },
+        proposedBudget: {
+          type: "number",
+          example: 150000,
+          description: "Proposed budget in Naira",
+        },
+        rateType: {
+          type: "string",
+          enum: ["FIXED", "HOURLY"],
+          example: "FIXED",
+          description: "Rate type",
+        },
+        proposedDurationDays: {
+          type: "number",
+          example: 21,
+          description: "Proposed duration in days",
+        },
+        experience: {
+          type: "string",
+          enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"],
+          example: "ADVANCED",
+          description: "Experience level",
+        },
+        portfolio: {
+          type: "string",
+          format: "uri",
+          example: "https://portfolio.example.com",
+          description: "Portfolio URL",
+        },
+        attachments: {
+          type: "array",
+          items: {
+            type: "string",
+            format: "binary",
+          },
+          description: "File attachments (max 10 files, 50MB each)",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Bid updated successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Validation error or bid cannot be updated",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not the bid owner",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bid not found",
+  })
+  async update(
+    @Param("bidId") bidId: string,
+    @Body() dto: UpdateBidDto,
+    @Req() request: Request,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
+          new FileTypeValidator({
+            fileType: /(image|video|application)\/(.*)/,
+          }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    files?: Express.Multer.File[],
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.bidService.update(bidId, id, dto, files || []);
   }
 }
