@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, EntityManager } from "typeorm";
+import { Repository, EntityManager, In } from "typeorm";
 import { Bid, BidStatus, BidRateType } from "../model/bid.entity";
 import { Proposal, ProposalStatus } from "../model/proposal.entity";
 import { User } from "../model/user.entity";
@@ -36,7 +36,7 @@ export class BidService {
     });
     if (!proposal) throw new NotFoundException("Proposal not found");
     if (proposal.status !== "open")
-      throw new BadRequestException("Proposal not open");
+      throw new BadRequestException("This proposal is no longer open.");
 
     // Upload files to Cloudinary if any
     let attachments: AttachmentMetadata[] | undefined;
@@ -175,6 +175,57 @@ export class BidService {
     });
   }
 
+  // ✅ Get all bids for client responses (excluding proposals with active contracts)
+  async findResponsesBidsForClient(clientId: string) {
+    // Get all proposals for client
+    const proposals = await this.proposalRepo.find({
+      where: { clientId },
+      select: ["id"],
+    });
+
+    if (proposals.length === 0) {
+      return [];
+    }
+
+    const proposalIds = proposals.map((p) => p.id);
+
+    // Get all proposals that have active contracts (awaiting_payment, active, or completed)
+    const proposalsWithActiveContracts = await this.contractRepo
+      .createQueryBuilder("contract")
+      .select("DISTINCT contract.proposalId", "proposalId")
+      .where("contract.proposalId IN (:...proposalIds)", { proposalIds })
+      .andWhere("contract.status IN (:...statuses)", {
+        statuses: [
+          ContractStatus.AWAITING_PAYMENT,
+          ContractStatus.ACTIVE,
+          ContractStatus.COMPLETED,
+        ],
+      })
+      .getRawMany();
+
+    const activeContractProposalIds = new Set(
+      proposalsWithActiveContracts.map((c) => c.proposalId),
+    );
+
+    // Filter out proposals with active contracts
+    const proposalsWithoutActiveContracts = proposalIds.filter(
+      (id) => !activeContractProposalIds.has(id),
+    );
+
+    if (proposalsWithoutActiveContracts.length === 0) {
+      return [];
+    }
+
+    // Get all bids for proposals without active contracts
+    return this.bidRepo.find({
+      where: {
+        proposalId: In(proposalsWithoutActiveContracts),
+      },
+      relations: ["proposal", "freelancer", "freelancer.freelancerProfile"],
+      order: { createdAt: "DESC" },
+    });
+  }
+
   // ✅ Get all bids for a freelancer
   async findByFreelancer(freelancerId: string) {
     return this.bidRepo.find({
@@ -186,6 +237,16 @@ export class BidService {
         "proposal.categories",
       ],
       order: { createdAt: "DESC" },
+    });
+  }
+
+  // ✅ Get count of active (pending) bids for freelancer
+  async countActiveBidsForFreelancer(freelancerId: string): Promise<number> {
+    return this.bidRepo.count({
+      where: {
+        freelancerId,
+        status: BidStatus.PENDING,
+      },
     });
   }
 
@@ -281,13 +342,26 @@ export class BidService {
       if (bid.status !== BidStatus.PENDING)
         throw new BadRequestException("Bid must be pending to hire");
 
+      // Check if there's already an active contract for this proposal
+      const existingContract = await transactionalManager.findOne(Contract, {
+        where: {
+          proposalId: bid.proposalId,
+          status: ContractStatus.AWAITING_PAYMENT,
+        },
+      });
+
+      if (existingContract)
+        throw new BadRequestException(
+          "A contract for this proposal is already awaiting payment. You cannot hire another freelancer.",
+        );
+
       // Accept the bid
       bid.status = BidStatus.ACCEPTED;
       await transactionalManager.save(bid);
 
       // Create contract with bid details (duration, rateType)
       const contract = transactionalManager.create(Contract, {
-        // proposal: bid.proposal, - No need to set proposal since it's already set in the bid
+        proposal: bid.proposal, // Set the proposal since it's already set in the bid
         bid, // Link to the bid
         client,
         freelancer: bid.freelancer,

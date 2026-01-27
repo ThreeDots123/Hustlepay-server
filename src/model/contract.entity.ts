@@ -13,6 +13,7 @@ import { Proposal } from "./proposal.entity";
 import { Bid } from "./bid.entity";
 import { Milestone } from "./milestone.entity";
 import { Payment } from "./payment.entity";
+import { Deliverable } from "./deliverable.entity";
 import { DbAwareColumn } from "src/utils/db-parse-column";
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
 import { BidRateType } from "./bid.entity";
@@ -20,7 +21,9 @@ import { BidRateType } from "./bid.entity";
 export enum ContractStatus {
   PENDING_CLIENT_APPROVAL = "pending_client_approval", // Freelancer accepted proposal, waiting for client to approve
   AWAITING_PAYMENT = "awaiting_payment",
+  PAYMENT_INITIATED = "payment_initiated", // Payment initiated for contract
   ACTIVE = "active",
+  PAUSED = "paused",
   COMPLETED = "completed",
   CANCELLED = "cancelled",
   DISPUTED = "disputed",
@@ -98,4 +101,7 @@ export class Contract extends SoftDeletableEntity {
 
   @OneToMany(() => Payment, (p) => p.contract)
   payments: Payment[];
+
+  @OneToMany(() => Deliverable, (d) => d.contract, { cascade: true })
+  deliverables: Deliverable[];
 }

@@ -41,6 +41,7 @@ import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import transformToAuthenticatedUser from "src/transformers/authenticated-user";
 import { BidService } from "src/bid/bid.service";
 import { UpdateBidDto } from "src/bid/dto/update-bid.dto";
+import { ContractService } from "src/contract/contract.service";
 
 @ApiTags("Users")
 @Controller("users")
@@ -49,6 +50,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private profileService: ProfileService,
     private bidService: BidService,
+    private contractService: ContractService,
   ) {}
 
   @UseGuards(IsFreelancerGuard)
@@ -492,6 +494,134 @@ export class UsersController {
   async getMyBids(@Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
     return this.bidService.findByFreelancer(id);
+  }
+
+  @Get("freelancer/stats/active-bids")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get count of active bids for freelancer",
+    description:
+      "Returns the count of pending bids submitted by the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Active bids count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getActiveBidsCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.bidService.countActiveBidsForFreelancer(id);
+    return { count };
+  }
+
+  @Get("freelancer/stats/jobs-in-progress")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get count of jobs in progress for freelancer",
+    description:
+      "Returns the count of active contracts for the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Jobs in progress count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getJobsInProgressCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.contractService.countActiveContractsForFreelancer(id);
+    return { count };
+  }
+
+  @Get("freelancer/stats/jobs-completed")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get count of completed jobs for freelancer",
+    description:
+      "Returns the count of completed contracts for the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Completed jobs count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getJobsCompletedCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.contractService.countCompletedContractsForFreelancer(id);
+    return { count };
+  }
+
+  @Get("freelancer/stats/total-revenue")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get total revenue for freelancer",
+    description:
+      "Returns the total revenue earned from all completed contracts for the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Total revenue retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        total: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getTotalRevenue(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const total = await this.contractService.getTotalRevenueForFreelancer(id);
+    return { total };
   }
 
   @Patch("bids/:id")

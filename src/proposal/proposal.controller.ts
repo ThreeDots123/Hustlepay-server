@@ -350,6 +350,134 @@ export class ProposalController {
     );
   }
 
+  @Get("/me/stats/total-proposals")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get total proposals count for client",
+    description:
+      "Returns the total count of proposals created by the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Total proposals count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getTotalProposalsCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.svc.countTotalProposalsForClient(id);
+    return { count };
+  }
+
+  @Get("/me/stats/active-projects")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get active projects count for client",
+    description:
+      "Returns the count of active (hired) projects for the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Active projects count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getActiveProjectsCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.svc.countActiveProjectsForClient(id);
+    return { count };
+  }
+
+  @Get("/me/stats/total-budget")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get total budget for client",
+    description:
+      "Returns the total budget (sum of all proposal budgets) for the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Total budget retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        total: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getTotalBudget(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const total = await this.svc.getTotalBudgetForClient(id);
+    return { total };
+  }
+
+  @Get("/me/stats/total-responses")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get total responses count for client",
+    description:
+      "Returns the total count of bids and contracts for proposals without active contracts for the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Total responses count retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getTotalResponsesCount(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const count = await this.svc.getTotalResponsesForClient(id);
+    return { count };
+  }
+
   @Get("/client/:slug")
   @UseGuards(IsClientGuard)
   @ApiBearerAuth("JWT-auth")

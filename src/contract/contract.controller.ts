@@ -18,6 +18,7 @@ import {
 import { ContractService } from "./contract.service";
 import { CreateContractDto } from "./dto/create-contract.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
+import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
 import { Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
 import { UsersService } from "src/user/user.service";
@@ -69,6 +70,32 @@ export class ContractController {
     });
 
     return this.svc.createFromBid(user, dto);
+  }
+
+  @Get("responses")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get all response contracts for client",
+    description:
+      "Retrieves all pending_client_approval contracts for proposals owned by the authenticated client, excluding proposals with active contracts.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "List of response contracts retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getResponsesContracts(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    console.log("Here");
+    return this.svc.findResponsesContractsForClient(id);
   }
 
   @Get(":id")
@@ -136,10 +163,7 @@ export class ContractController {
     @Req() request: Request,
   ) {
     const { id } = request.user as AuthorisedRequest;
-    const user = await this.userService.findSingleUser({
-      where: { id },
-    });
-    return this.svc.findByProposal(proposalId, user.id);
+    return this.svc.findByProposal(proposalId, id);
   }
 
   @Post(":id/approve")
@@ -176,14 +200,61 @@ export class ContractController {
     status: 404,
     description: "Contract not found",
   })
-  async approve(
-    @Param("id") contractId: string,
-    @Req() request: Request,
-  ) {
+  async approve(@Param("id") contractId: string, @Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
     const user = await this.userService.findSingleUser({
       where: { id },
     });
     return this.svc.approveContract(contractId, user.id);
+  }
+
+  @Get("freelancer/active")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get active contracts for freelancer",
+    description:
+      "Retrieves all active contracts (active or awaiting_payment) for the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Active contracts retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getActiveContracts(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.findActiveContractsForFreelancer(id);
+  }
+
+  @Get("freelancer/completed")
+  @UseGuards(IsFreelancerGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get completed contracts for freelancer",
+    description:
+      "Retrieves all completed contracts for the authenticated freelancer.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Completed contracts retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a freelancer",
+  })
+  async getCompletedContracts(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.findCompletedContractsForFreelancer(id);
   }
 }

@@ -464,6 +464,31 @@ export class ClientBidsController {
     const { id } = request.user as AuthorisedRequest;
     return this.svc.findActiveBidsForClient(id);
   }
+
+  @Get("responses")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get all response bids for client",
+    description:
+      "Retrieves all bids for proposals owned by the authenticated client, excluding proposals with active contracts.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "List of response bids retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getResponsesBids(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.findResponsesBidsForClient(id);
+  }
 }
 
 @ApiTags("Bids")

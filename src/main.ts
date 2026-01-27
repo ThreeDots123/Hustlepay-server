@@ -6,8 +6,11 @@ import { ValidationPipe } from "@nestjs/common";
 import { ResponseTransformerInterceptor } from "./interceptors/response.interceptor";
 import { ExceptionFilter } from "./interceptors/exception-filter.interceptor";
 import { CORS_WHITELIST_URLS, PORT } from "./config/env";
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Enable raw body for webhook signature verification
+  });
   const configService = app.get(ConfigService);
 
   // Enabling validation globally with dto files
@@ -39,9 +42,18 @@ async function bootstrap() {
       },
       "JWT-auth", // This name here is important for matching up with @ApiBearerAuth() in your controller!
     )
-    .addTag("Authentication", "User authentication and email verification endpoints")
-    .addTag("Users", "User profile management and freelancer discovery endpoints")
-    .addTag("Proposals", "Proposal creation, management, and discovery endpoints")
+    .addTag(
+      "Authentication",
+      "User authentication and email verification endpoints",
+    )
+    .addTag(
+      "Users",
+      "User profile management and freelancer discovery endpoints",
+    )
+    .addTag(
+      "Proposals",
+      "Proposal creation, management, and discovery endpoints",
+    )
     .addTag("Bids", "Bid creation, management, and retrieval endpoints")
     .addTag("Contracts", "Contract creation and management endpoints")
     .addTag("Password", "Password reset and recovery endpoints")

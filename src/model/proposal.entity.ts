@@ -7,7 +7,6 @@ import {
   JoinTable,
   Index,
   JoinColumn,
-  BeforeUpdate,
   BeforeInsert,
 } from "typeorm";
 import { User } from "./user.entity";
@@ -97,7 +96,6 @@ export class Proposal extends SoftDeletableEntity {
   slug: string;
 
   @BeforeInsert()
-  @BeforeUpdate()
   generateSlug() {
     if (this.title) {
       const baseSlug = slugify(this.title.toLowerCase());

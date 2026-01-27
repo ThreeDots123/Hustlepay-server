@@ -9,6 +9,7 @@ export enum PaymentStatus {
   SUCCESS = "success",
   FAILED = "failed",
   ESCROWED = "escrowed",
+  RELEASED = "released",
   REFUNDED = "refunded",
   DISPUTED = "disputed",
 }
