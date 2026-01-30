@@ -16,6 +16,10 @@ import { ProposalModule } from "./proposal/proposal.module";
 import { BidModule } from "./bid/bid.module";
 import { ContractModule } from './contract/contract.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { PaymentModule } from './payment/payment.module';
+import { MilestoneModule } from './milestone/milestone.module';
+import { DeliverableModule } from './deliverable/deliverable.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -39,6 +43,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     BidModule,
     ContractModule,
     CloudinaryModule,
+    PaymentModule,
+    MilestoneModule,
+    DeliverableModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

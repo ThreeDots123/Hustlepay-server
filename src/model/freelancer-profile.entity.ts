@@ -40,7 +40,9 @@ export class FreelancerProfile extends SoftDeletableEntity {
   @Column({ name: "user_id", nullable: false })
   userId: string;
 
-  @OneToOne(() => User, { onDelete: "CASCADE" })
+  @OneToOne(() => User, (user) => user.freelancerProfile, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "user_id" })
   user: User;
 

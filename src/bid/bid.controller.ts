@@ -25,6 +25,8 @@ import {
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { BidService } from "./bid.service";
 import { CreateBidDto } from "./dto/create-bid.dto";
+import { UpdateBidDto } from "./dto/update-bid.dto";
+import { HireFreelancerDto } from "./dto/hire-freelancer.dto";
 import { UsersService } from "src/user/user.service";
 import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
@@ -58,7 +60,12 @@ export class BidController {
   @ApiBody({
     schema: {
       type: "object",
-      required: ["title", "coverLetter", "proposedBudget", "proposedDurationDays"],
+      required: [
+        "title",
+        "coverLetter",
+        "proposedBudget",
+        "proposedDurationDays",
+      ],
       properties: {
         title: {
           type: "string",
@@ -287,6 +294,12 @@ export class BidController {
       "Withdraws a bid from a proposal. Only the bid owner (freelancer) can withdraw their bid.",
   })
   @ApiParam({
+    name: "proposalId",
+    description: "Proposal ID",
+    type: String,
+    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiParam({
     name: "id",
     description: "Bid ID",
     type: String,
@@ -308,7 +321,11 @@ export class BidController {
     status: 404,
     description: "Bid not found",
   })
-  async withdraw(@Param("id") bidId: string, @Req() request: Request) {
+  async withdraw(
+    @Param("proposalId") proposalId: string,
+    @Param("id") bidId: string,
+    @Req() request: Request,
+  ) {
     const { id } = request.user as AuthorisedRequest;
     const user = await this.userService.findSingleUser({
       where: { id },
@@ -354,6 +371,68 @@ export class BidController {
     });
     return this.svc.accept(user, bidId);
   }
+
+  @Post(":id/hire")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Hire freelancer from bid",
+    description:
+      "Accepts a bid and creates a contract in a single step. Only the proposal owner (client) can hire freelancers.",
+  })
+  @ApiParam({
+    name: "proposalId",
+    description: "Proposal ID",
+    type: String,
+    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Bid ID to hire from",
+    type: String,
+    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiBody({
+    type: HireFreelancerDto,
+    description: "Contract creation data",
+  })
+  @ApiResponse({
+    status: 201,
+    description: "Freelancer hired and contract created successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Validation error or bid cannot be hired",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not the proposal owner",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Bid not found",
+  })
+  async hire(
+    @Param("proposalId") proposalId: string,
+    @Param("id") bidId: string,
+    @Body() dto: HireFreelancerDto,
+    @Req() request: Request,
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.userService.findSingleUser({
+      where: { id },
+    });
+    return this.svc.hireFreelancer(
+      user,
+      bidId,
+      dto.amount,
+      dto.currency || "ngn",
+    );
+  }
 }
 
 @ApiTags("Bids")
@@ -385,4 +464,38 @@ export class ClientBidsController {
     const { id } = request.user as AuthorisedRequest;
     return this.svc.findActiveBidsForClient(id);
   }
+
+  @Get("responses")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get all response bids for client",
+    description:
+      "Retrieves all bids for proposals owned by the authenticated client, excluding proposals with active contracts.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "List of response bids retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getResponsesBids(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.findResponsesBidsForClient(id);
+  }
+}
+
+@ApiTags("Bids")
+@Controller("bids")
+export class FreelancerBidsController {
+  constructor(
+    private readonly svc: BidService,
+    private userService: UsersService,
+  ) {}
 }

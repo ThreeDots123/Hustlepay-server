@@ -2,16 +2,18 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { ILike, Repository, EntityManager, In } from "typeorm";
 import { Proposal, ProposalStatus } from "../model/proposal.entity";
 import { CreateProposalDto } from "./dto/create-proposal.dto";
 import { UpdateProposalDto } from "./dto/update-proposal.dto";
 import { User as UserEntity } from "../model/user.entity";
 import { SkillCatalog as SkillCatalogEntity } from "../model/skill-catalog.entity";
 import { CategoryCatalog as CategoryCatalogEntity } from "../model/category-catalog.entity";
-import { Bid } from "src/model/bid.entity";
+import { Bid, BidRateType } from "src/model/bid.entity";
+import { Contract, ContractStatus } from "../model/contract.entity";
 
 @Injectable()
 export class ProposalService {
@@ -23,6 +25,9 @@ export class ProposalService {
     @InjectRepository(CategoryCatalogEntity)
     private readonly categoryRepo: Repository<CategoryCatalogEntity>,
     @InjectRepository(Bid) private readonly bidRepo: Repository<Bid>,
+    @InjectRepository(Contract)
+    private readonly contractRepo: Repository<Contract>,
+    private readonly manager: EntityManager,
   ) {}
 
   async create(clientId: string, dto: CreateProposalDto) {
@@ -80,13 +85,30 @@ export class ProposalService {
         where: { slug },
         relations: ["client", "skills", "categories", "bids"],
       });
+
       if (!p) throw new NotFoundException("Proposal not found");
 
       const alreadyBidded = await this.bidRepo.exists({
         where: { freelancerId: user.freelancer, proposalId: p.id },
       });
-      return { proposal: p, alreadyBidded };
+      const canAcceptProposal = await this.contractRepo.exists({
+        where: { freelancerId: user.freelancer, proposalId: p.id },
+      });
+
+      return { proposal: p, alreadyBidded, canAcceptProposal };
     }
+
+    // Client case
+    if ("client" in user) {
+      const p = await this.proposalRepo.findOne({
+        where: { slug, clientId: user.client },
+        relations: ["client", "skills", "categories", "bids"],
+      });
+      if (!p) throw new NotFoundException("Proposal not found");
+      return p;
+    }
+
+    throw new ForbiddenException("Invalid user type");
   }
 
   async findAll(
@@ -128,6 +150,16 @@ export class ProposalService {
       qb.leftJoinAndSelect("p.client", "client");
       // Only show proposals that are not closed
       qb.where("p.status != :status", { status: ProposalStatus.CLOSED });
+
+      // Exclude proposals that have active contracts (awaiting_payment, active, or completed)
+      qb.andWhere(
+        `NOT EXISTS (
+          SELECT 1 FROM contract c 
+          WHERE c.proposal_id = p.id 
+          AND c.user_status IN ('awaiting_payment', 'active', 'completed')
+          AND c.deleted_at IS NULL
+        )`,
+      );
     }
 
     // Search query - search in title, description, skills, and categories
@@ -210,5 +242,189 @@ export class ProposalService {
       take: limit,
       order: { name: "ASC" },
     });
+  }
+
+  // ✅ Accept proposal directly (freelancer accepts without bidding)
+  async acceptProposal(
+    freelancer: UserEntity,
+    proposalId: string,
+    contractAmount?: number,
+    currency?: string,
+  ) {
+    return this.manager.transaction(async (transactionalManager) => {
+      // Find proposal with client relation
+      const proposal = await transactionalManager.findOne(Proposal, {
+        where: { id: proposalId },
+        relations: ["client"],
+      });
+
+      if (!proposal) throw new NotFoundException("Proposal not found");
+
+      if (proposal.status === ProposalStatus.HIRED)
+        throw new BadRequestException("Proposal has already been hired");
+
+      if (proposal.status !== ProposalStatus.OPEN)
+        throw new BadRequestException("Proposal must be open to accept");
+
+      // Check if there's already an active contract (AWAITING_PAYMENT) for this proposal
+      // This prevents freelancers from accepting if a contract is already awaiting payment
+      const existingContract = await transactionalManager.findOne(Contract, {
+        where: {
+          proposalId: proposal.id,
+          status: ContractStatus.AWAITING_PAYMENT,
+        },
+      });
+
+      if (existingContract)
+        throw new BadRequestException(
+          "A contract for this proposal is already awaiting payment. The proposal is no longer accepting new acceptances.",
+        );
+
+      // Determine contract amount
+      let finalAmount: number;
+      if (contractAmount !== undefined && contractAmount !== null) {
+        finalAmount = contractAmount;
+        // Validate amount is within budget range if range exists
+        if (proposal.budgetMin && proposal.budgetMax) {
+          if (
+            finalAmount < proposal.budgetMin ||
+            finalAmount > proposal.budgetMax
+          ) {
+            throw new BadRequestException(
+              `Contract amount must be between ${proposal.budgetMin} and ${proposal.budgetMax}`,
+            );
+          }
+        } else if (proposal.budgetMin && finalAmount < proposal.budgetMin) {
+          throw new BadRequestException(
+            `Contract amount must be at least ${proposal.budgetMin}`,
+          );
+        } else if (proposal.budgetMax && finalAmount > proposal.budgetMax) {
+          throw new BadRequestException(
+            `Contract amount must be at most ${proposal.budgetMax}`,
+          );
+        }
+      } else {
+        // Use proposal's budget
+        if (proposal.budgetMin === proposal.budgetMax && proposal.budgetMin) {
+          finalAmount = proposal.budgetMin;
+        } else if (proposal.budgetMin) {
+          finalAmount = proposal.budgetMin;
+        } else if (proposal.budgetMax) {
+          finalAmount = proposal.budgetMax;
+        } else {
+          throw new BadRequestException(
+            "Proposal must have a budget to accept directly",
+          );
+        }
+      }
+
+      // Determine currency
+      const finalCurrency = currency || proposal.currency || "ngn";
+
+      // Create contract with proposal details (duration, default rateType)
+      // Status is PENDING_CLIENT_APPROVAL - client needs to approve before payment
+      const contract = transactionalManager.create(Contract, {
+        proposal,
+        // No bid reference since this is direct acceptance
+        client: proposal.client,
+        freelancer,
+        amount: finalAmount,
+        currency: finalCurrency,
+        durationDays: proposal.durationEstimateDays, // From proposal
+        rateType: BidRateType.FIXED, // Default to FIXED for direct acceptance
+        status: ContractStatus.PENDING_CLIENT_APPROVAL,
+      });
+      const savedContract = await transactionalManager.save(contract);
+
+      // Don't mark proposal as HIRED yet - client needs to approve
+      // Proposal remains OPEN so other freelancers can also accept
+      // Only mark as HIRED when client approves a contract
+
+      return savedContract;
+    });
+  }
+
+  // ✅ Get count of total proposals for client
+  async countTotalProposalsForClient(clientId: string): Promise<number> {
+    return this.proposalRepo.count({
+      where: { clientId },
+    });
+  }
+
+  // ✅ Get count of active projects for client (hired status)
+  async countActiveProjectsForClient(clientId: string): Promise<number> {
+    return this.proposalRepo.count({
+      where: { clientId, status: ProposalStatus.HIRED },
+    });
+  }
+
+  // ✅ Get total budget for client (sum of all proposal budgets)
+  async getTotalBudgetForClient(clientId: string): Promise<number> {
+    const proposals = await this.proposalRepo.find({
+      where: { clientId },
+      select: ["budgetMin", "budgetMax"],
+    });
+
+    return proposals.reduce((sum, p) => {
+      // Use max budget if available, otherwise min, otherwise 0
+      return sum + (p.budgetMax || p.budgetMin || 0);
+    }, 0);
+  }
+
+  // ✅ Get total responses for client (bids + contracts, excluding proposals with active contracts)
+  async getTotalResponsesForClient(clientId: string): Promise<number> {
+    // Get all proposals for client
+    const proposals = await this.proposalRepo.find({
+      where: { clientId },
+      select: ["id"],
+    });
+
+    if (proposals.length === 0) {
+      return 0;
+    }
+
+    const proposalIds = proposals.map((p) => p.id);
+
+    // Get all proposals that have active contracts (awaiting_payment, active, or completed)
+    const proposalsWithActiveContracts = await this.contractRepo
+      .createQueryBuilder("contract")
+      .select("DISTINCT contract.proposalId", "proposalId")
+      .where("contract.proposalId IN (:...proposalIds)", { proposalIds })
+      .andWhere("contract.status IN (:...statuses)", {
+        statuses: [
+          ContractStatus.AWAITING_PAYMENT,
+          ContractStatus.ACTIVE,
+          ContractStatus.COMPLETED,
+        ],
+      })
+      .getRawMany();
+
+    const activeContractProposalIds = new Set(
+      proposalsWithActiveContracts.map((c) => c.proposalId),
+    );
+
+    // Filter out proposals with active contracts
+    const proposalsWithoutActiveContracts = proposalIds.filter(
+      (id) => !activeContractProposalIds.has(id),
+    );
+
+    if (proposalsWithoutActiveContracts.length === 0) {
+      return 0;
+    }
+
+    // Count bids for proposals without active contracts
+    const bidCount = await this.bidRepo.count({
+      where: { proposalId: In(proposalsWithoutActiveContracts) },
+    });
+
+    // Count contracts in pending_client_approval for proposals without active contracts
+    const contractCount = await this.contractRepo.count({
+      where: {
+        proposalId: In(proposalsWithoutActiveContracts),
+        status: ContractStatus.PENDING_CLIENT_APPROVAL,
+      },
+    });
+
+    return bidCount + contractCount;
   }
 }

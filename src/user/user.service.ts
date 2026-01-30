@@ -11,6 +11,7 @@ import {
   UserRole,
   UserStatus,
 } from "src/model/user.entity";
+import { Wallet } from "src/model/wallet.entity";
 import { CreateUserDto } from "src/user/dto/create-user-pswrd.dto";
 import BaseService from "src/interface/service/base.service";
 import { userEmailAlreadyExists } from "src/constants/response-messages";
@@ -21,6 +22,8 @@ export class UsersService extends BaseService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    @InjectRepository(Wallet)
+    private walletRepository: Repository<Wallet>,
     private profileService: ProfileService,
   ) {
     super();
@@ -117,5 +120,12 @@ export class UsersService extends BaseService {
     if (!checkUser)
       throw new NotFoundException(`User  with this Id: ${id} not found`);
     return checkUser;
+  }
+
+  async checkFreelancerWallet(userId: string): Promise<{ hasWallet: boolean }> {
+    const wallet = await this.walletRepository.findOne({
+      where: { userId },
+    });
+    return { hasWallet: !!wallet };
   }
 }
