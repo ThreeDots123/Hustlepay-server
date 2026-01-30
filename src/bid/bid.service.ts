@@ -229,7 +229,7 @@ export class BidService {
   // ✅ Get all bids for a freelancer
   async findByFreelancer(freelancerId: string) {
     return this.bidRepo.find({
-      where: { freelancerId },
+      where: { freelancerId, status: BidStatus.PENDING },
       relations: [
         "proposal",
         "proposal.client",

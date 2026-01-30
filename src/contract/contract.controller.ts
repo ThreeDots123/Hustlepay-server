@@ -6,7 +6,13 @@ import {
   Req,
   Param,
   Get,
+  UseInterceptors,
+  UploadedFiles,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import {
   ApiTags,
   ApiOperation,
@@ -14,9 +20,11 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiBody,
+  ApiConsumes,
 } from "@nestjs/swagger";
 import { ContractService } from "./contract.service";
 import { CreateContractDto } from "./dto/create-contract.dto";
+import { SubmitContractDto } from "./dto/submit-contract.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
 import { Request } from "express";
@@ -256,5 +264,115 @@ export class ContractController {
   async getCompletedContracts(@Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
     return this.svc.findCompletedContractsForFreelancer(id);
+  }
+
+  @Get("client/active")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get active contracts for client",
+    description:
+      "Retrieves all active contracts (active, awaiting_payment, or payment_initiated) for the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Active contracts retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getActiveContractsForClient(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.findActiveContractsForClient(id);
+  }
+
+  @Post(":id/submit")
+  @UseGuards(IsFreelancerGuard)
+  @UseInterceptors(FilesInterceptor("files", 10))
+  @ApiBearerAuth("JWT-auth")
+  @ApiConsumes("multipart/form-data")
+  @ApiOperation({
+    summary: "Submit full contract for review",
+    description:
+      "Submits completed work for a full contract (non-milestone) with optional files, links, and description. Only the freelancer assigned to the contract can submit.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Contract ID",
+    type: String,
+    example: "ctrct_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  })
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        description: {
+          type: "string",
+          description: "Submission description or notes (optional)",
+          example: "Completed all project requirements as requested.",
+        },
+        links: {
+          type: "array",
+          items: { type: "string" },
+          description: "Array of links related to the submission (optional)",
+          example: ["https://example.com/project"],
+        },
+        files: {
+          type: "array",
+          items: { type: "string", format: "binary" },
+          description: "File attachments (max 10 files, 50MB each)",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Contract submitted successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Contract is not active or validation error",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      "Forbidden - User is not a freelancer or not assigned to this contract",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Contract not found",
+  })
+  async submit(
+    @Param("id") contractId: string,
+    @Req() request: Request,
+    @Body() dto: SubmitContractDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
+          new FileTypeValidator({
+            fileType: /(image|video|application)\/(.*)/,
+          }),
+        ],
+        fileIsRequired: false, // Files are optional
+      }),
+    )
+    files?: Express.Multer.File[],
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.userService.findSingleUser({
+      where: { id },
+    });
+
+    return this.svc.submitContract(user, contractId, dto, files || []);
   }
 }

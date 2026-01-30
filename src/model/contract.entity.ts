@@ -104,4 +104,24 @@ export class Contract extends SoftDeletableEntity {
 
   @OneToMany(() => Deliverable, (d) => d.contract, { cascade: true })
   deliverables: Deliverable[];
+
+  // Submission fields for full contracts
+  @DbAwareColumn({
+    type: "jsonb",
+    nullable: true,
+    name: "submission_attachments",
+  })
+  submissionAttachments?: Array<{
+    id: string;
+    name: string;
+    type: "image" | "video" | "document" | "other";
+    size: number;
+    url: string; // URL to the uploaded file
+  }>;
+
+  @Column({ type: "text", nullable: true, name: "submission_links" })
+  submissionLinks?: string; // Concatenated links separated by "|"
+
+  @Column({ type: "text", nullable: true, name: "submission_description" })
+  submissionDescription?: string; // Submission notes/description
 }

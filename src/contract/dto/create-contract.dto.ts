@@ -1,12 +1,11 @@
-import { IsString, IsUUID, IsInt, Min, IsOptional } from "class-validator";
+import { IsString, IsInt, Min, IsOptional } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateContractDto {
   @ApiProperty({
     description: "Bid ID to create contract from",
-    example: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    example: "bid_01ARZ3NDEKTSV4RRFFQ69G5FAV",
   })
-  @IsUUID()
   bidId: string;
 
   @ApiProperty({

@@ -556,7 +556,8 @@ export class UsersController {
   })
   async getJobsInProgressCount(@Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
-    const count = await this.contractService.countActiveContractsForFreelancer(id);
+    const count =
+      await this.contractService.countActiveContractsForFreelancer(id);
     return { count };
   }
 
@@ -588,7 +589,8 @@ export class UsersController {
   })
   async getJobsCompletedCount(@Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
-    const count = await this.contractService.countCompletedContractsForFreelancer(id);
+    const count =
+      await this.contractService.countCompletedContractsForFreelancer(id);
     return { count };
   }
 
@@ -732,5 +734,22 @@ export class UsersController {
   ) {
     const { id } = request.user as AuthorisedRequest;
     return this.bidService.update(bidId, id, dto, files || []);
+  }
+
+  @UseGuards(IsFreelancerGuard)
+  @Get("freelancer/wallet/check")
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Check if freelancer has a wallet",
+    description: "Returns whether the authenticated freelancer has a wallet created (i.e., has completed at least one project or milestone).",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Wallet check completed successfully",
+  })
+  async checkFreelancerWallet(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    const result = await this.usersService.checkFreelancerWallet(id);
+    return result;
   }
 }

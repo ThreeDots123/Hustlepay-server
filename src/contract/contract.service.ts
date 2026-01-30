@@ -5,18 +5,28 @@ import {
   ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DataSource, In } from "typeorm";
+import { Repository, DataSource, In, EntityManager } from "typeorm";
 import { Contract, ContractStatus } from "../model/contract.entity";
 import { Bid, BidStatus, BidRateType } from "../model/bid.entity";
 import { CreateContractDto } from "./dto/create-contract.dto";
 import { User } from "../model/user.entity";
 import { Proposal, ProposalStatus } from "../model/proposal.entity";
 import { Milestone, MilestoneStatus } from "../model/milestone.entity";
+import { Payment, PaymentStatus } from "../model/payment.entity";
+import { Wallet } from "../model/wallet.entity";
+import { TransactionService } from "src/transaction/transaction.service";
+import {
+  TransactionType,
+  TransactionStatus,
+} from "../model/transaction.entity";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { SubmitContractDto } from "./dto/submit-contract.dto";
 
 @Injectable()
 export class ContractService {
   constructor(
     private dataSource: DataSource,
+    private readonly transactionService: TransactionService,
     @InjectRepository(Contract)
     private readonly contractRepo: Repository<Contract>,
     @InjectRepository(Bid) private readonly bidRepo: Repository<Bid>,
@@ -24,6 +34,11 @@ export class ContractService {
     private readonly proposalRepo: Repository<Proposal>,
     @InjectRepository(Milestone)
     private readonly milestoneRepo: Repository<Milestone>,
+    @InjectRepository(Payment)
+    private readonly paymentRepo: Repository<Payment>,
+    @InjectRepository(Wallet)
+    private readonly walletRepo: Repository<Wallet>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async createFromBid(client: User, dto: CreateContractDto) {
@@ -246,9 +261,10 @@ export class ContractService {
     });
   }
 
-  // ✅ Get total revenue from completed contracts for freelancer
+  // ✅ Get total revenue from completed contracts and completed milestones for freelancer
   async getTotalRevenueForFreelancer(freelancerId: string): Promise<number> {
-    const result = await this.contractRepo
+    // Get revenue from completed contracts (full payment contracts)
+    const completedContractsResult = await this.contractRepo
       .createQueryBuilder("contract")
       .select("COALESCE(SUM(contract.amount), 0)", "total")
       .where("contract.freelancerId = :freelancerId", { freelancerId })
@@ -257,7 +273,29 @@ export class ContractService {
       })
       .getRawOne();
 
-    return parseInt(result?.total || "0", 10);
+    const completedContractsRevenue = parseInt(
+      completedContractsResult?.total || "0",
+      10,
+    );
+
+    // Get revenue from completed milestones (milestone-based contracts)
+    const completedMilestonesResult = await this.milestoneRepo
+      .createQueryBuilder("milestone")
+      .innerJoin("milestone.contract", "contract")
+      .select("COALESCE(SUM(milestone.amount), 0)", "total")
+      .where("contract.freelancerId = :freelancerId", { freelancerId })
+      .andWhere("milestone.status = :status", {
+        status: MilestoneStatus.COMPLETED,
+      })
+      .andWhere("milestone.parentId IS NOT NULL") // Only count child milestones
+      .getRawOne();
+
+    const completedMilestonesRevenue = parseInt(
+      completedMilestonesResult?.total || "0",
+      10,
+    );
+
+    return completedContractsRevenue + completedMilestonesRevenue;
   }
 
   // ✅ Get contracts for freelancer by status
@@ -314,6 +352,26 @@ export class ContractService {
       where: { freelancerId, status: ContractStatus.COMPLETED },
       relations: [
         "client",
+        "proposal",
+        "proposal.skills",
+        "proposal.categories",
+        "bid",
+      ],
+      order: { createdAt: "DESC" },
+    });
+  }
+
+  // ✅ Get active contracts for client (active, awaiting_payment, or payment_initiated)
+  async findActiveContractsForClient(clientId: string): Promise<Contract[]> {
+    return this.contractRepo.find({
+      where: [
+        { clientId, status: ContractStatus.ACTIVE },
+        { clientId, status: ContractStatus.AWAITING_PAYMENT },
+        { clientId, status: ContractStatus.PAYMENT_INITIATED },
+      ],
+      relations: [
+        "client",
+        "freelancer",
         "proposal",
         "proposal.skills",
         "proposal.categories",
@@ -388,31 +446,273 @@ export class ContractService {
         // Get all child milestones (milestones with a parentId)
         const childMilestones = allMilestones.filter((m) => !!m.parentId);
 
-        // If there are child milestones, check if all are released
+        // If there are child milestones, check if all are completed
         if (childMilestones.length > 0) {
-          const allMilestonesReleased = childMilestones.every(
-            (milestone) => milestone.status === MilestoneStatus.RELEASED,
+          const allMilestonesCompleted = childMilestones.every(
+            (milestone) => milestone.status === MilestoneStatus.COMPLETED,
           );
 
-          if (allMilestonesReleased) {
+          if (allMilestonesCompleted) {
+            // Release any remaining escrowed payments to freelancer wallet
+            await this.releaseContractPayments(
+              manager,
+              contract.id,
+              contract.freelancerId,
+              contract.currency || "ngn",
+            );
+
             contract.status = ContractStatus.COMPLETED;
             return await manager.save(contract);
           }
         }
       } else {
-        // No parent milestones - check if all milestones are released
+        // No parent milestones - check if all milestones are completed
         // (for contracts created before parent-child structure)
-        const allMilestonesReleased = allMilestones.every(
-          (milestone) => milestone.status === MilestoneStatus.RELEASED,
+        const allMilestonesCompleted = allMilestones.every(
+          (milestone) => milestone.status === MilestoneStatus.COMPLETED,
         );
 
-        if (allMilestonesReleased) {
+        if (allMilestonesCompleted) {
+          // Release any remaining escrowed payments to freelancer wallet
+          // await this.releaseContractPayments(
+          //   manager,
+          //   contract.id,
+          //   contract.freelancerId,
+          //   contract.currency || "ngn",
+          // );
+
+          // Just update the contract status to completed since payments will be released in the milestones
+
           contract.status = ContractStatus.COMPLETED;
           return await manager.save(contract);
         }
       }
 
-      return null; // Not all milestones are released yet
+      return null; // Not all milestones are completed yet
+    });
+  }
+
+  // Helper method to release escrowed payments to freelancer wallet
+  private async releaseContractPayments(
+    manager: EntityManager,
+    contractId: string,
+    freelancerId: string,
+    currency: string,
+  ): Promise<void> {
+    // Find all escrowed payments for this contract
+    const escrowedPayments = await manager.find(Payment, {
+      where: {
+        contractId,
+        status: PaymentStatus.ESCROWED,
+      },
+    });
+
+    if (escrowedPayments.length === 0) {
+      return; // No escrowed payments to release
+    }
+
+    // Filter payments that are full payment mode (not milestone-specific)
+    // For milestone contracts, payments are already released when milestones are approved
+    const fullPayments = escrowedPayments.filter((payment: Payment) => {
+      const paymentMode =
+        payment.providerRaw?.metadata?.paymentMode ||
+        payment.providerRaw?.paymentMode;
+
+      // Release full payments or payments without milestoneId
+      return (
+        paymentMode === "full" ||
+        !payment.providerRaw?.metadata?.milestoneId ||
+        !payment.providerRaw?.milestoneId
+      );
+    });
+
+    if (fullPayments.length === 0) {
+      return; // No full payments to release
+    }
+
+    // Calculate total amount to release
+    const totalAmount = fullPayments.reduce(
+      (sum: number, payment: Payment) => sum + payment.amount,
+      0,
+    );
+
+    if (totalAmount === 0) {
+      return; // No amount to release
+    }
+
+    // Get or create freelancer wallet
+    let wallet = await manager.findOne(Wallet, {
+      where: { userId: freelancerId },
+    });
+
+    if (!wallet) {
+      // Create wallet if it doesn't exist
+      wallet = manager.create(Wallet, {
+        userId: freelancerId,
+        balance: 0,
+        currency,
+      });
+      wallet = await manager.save(wallet);
+    }
+
+    // Credit freelancer wallet
+    wallet.balance = Number(wallet.balance) + totalAmount;
+    await manager.save(wallet);
+
+    // Get contract and freelancer for transaction creation
+    const contract = await manager.findOne(Contract, {
+      where: { id: contractId },
+      relations: ["freelancer"],
+    });
+
+    if (!contract)
+      throw new BadRequestException(
+        "Cannot find contract for payment you're trying to release.",
+      );
+
+    const freelancer = contract.freelancer;
+
+    // Update payment statuses to RELEASED and create transactions
+    for (const payment of fullPayments) {
+      payment.status = PaymentStatus.RELEASED;
+      await manager.save(payment);
+
+      // Create transaction records for freelancer (full contract payment)
+      if (freelancer && contract) {
+        // For full contract payments, create transactions without milestone
+        await this.transactionService.createTransaction({
+          userId: freelancer.id,
+          type: TransactionType.RELEASED,
+          amount: payment.amount,
+          currency: payment.currency,
+          description: `Payment released for contract: ${contract.id}`,
+          contractId: contract.id,
+          paymentId: payment.id,
+          walletId: wallet.id,
+          metadata: {
+            paymentMode: "full",
+            providerPaymentId: payment.providerPaymentId,
+          },
+          status: TransactionStatus.COMPLETED,
+        });
+        await this.transactionService.createTransaction({
+          userId: freelancer.id,
+          type: TransactionType.PAYMENT_RECEIVED,
+          amount: payment.amount,
+          currency: payment.currency,
+          description: `Payment received for contract: ${contract.id}`,
+          contractId: contract.id,
+          paymentId: payment.id,
+          walletId: wallet.id,
+          metadata: {
+            paymentMode: "full",
+            providerPaymentId: payment.providerPaymentId,
+          },
+          status: TransactionStatus.COMPLETED,
+        });
+      }
+    }
+  }
+
+  /**
+   * Submit a full contract for client review
+   * Only works for full contracts (no child milestones) that are active
+   */
+  async submitContract(
+    freelancer: User,
+    contractId: string,
+    dto: SubmitContractDto,
+    files: Express.Multer.File[] = [],
+  ): Promise<Contract> {
+    return this.dataSource.transaction(async (manager) => {
+      // Find contract with relations
+      const contract = await manager.findOne(Contract, {
+        where: { id: contractId },
+        relations: ["freelancer", "milestones"],
+      });
+
+      if (!contract) {
+        throw new NotFoundException("Contract not found");
+      }
+
+      // Verify contract belongs to freelancer
+      if (contract.freelancerId !== freelancer.id) {
+        throw new ForbiddenException(
+          "You can only submit contracts assigned to you",
+        );
+      }
+
+      // Verify contract is active
+      if (contract.status !== ContractStatus.ACTIVE) {
+        throw new BadRequestException(
+          `Contract must be ACTIVE to submit. Current status: ${contract.status}`,
+        );
+      }
+
+      // Verify this is a full contract (no child milestones)
+      const childMilestones =
+        contract.milestones?.filter((m) => m.parentId) || [];
+      if (childMilestones.length > 0) {
+        throw new BadRequestException(
+          "Cannot submit milestone-based contracts. Use milestone submission instead.",
+        );
+      }
+
+      // Upload files to Cloudinary if any
+      let attachments:
+        | Array<{
+            id: string;
+            name: string;
+            type: "image" | "video" | "document" | "other";
+            size: number;
+            url: string;
+          }>
+        | undefined;
+
+      if (files && files.length > 0) {
+        const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+          files,
+          `contracts/${contractId}/submissions`,
+        );
+
+        const getFileType = (
+          mimeType: string,
+        ): "image" | "video" | "document" | "other" => {
+          if (mimeType.startsWith("image/")) return "image";
+          if (mimeType.startsWith("video/")) return "video";
+          if (
+            mimeType.includes("pdf") ||
+            mimeType.includes("document") ||
+            mimeType.includes("word")
+          )
+            return "document";
+          return "other";
+        };
+
+        attachments = uploadResults.map((result, index) => {
+          const file = files[index];
+          return {
+            id: result.public_id,
+            name: file.originalname,
+            type: getFileType(file.mimetype),
+            size: result.bytes,
+            url: result.secure_url,
+          };
+        });
+      }
+
+      // Concatenate links array into single string (separated by "|")
+      const submissionLinks =
+        dto.links && dto.links.length > 0 ? dto.links.join("|") : undefined;
+
+      // Update contract with submission data
+      // Note: We don't change the contract status here - it remains ACTIVE
+      // The client will see the submission and can approve/reject it
+      contract.submissionDescription = dto.description;
+      contract.submissionLinks = submissionLinks;
+      contract.submissionAttachments = attachments;
+
+      return await manager.save(contract);
     });
   }
 }

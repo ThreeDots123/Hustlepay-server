@@ -9,6 +9,7 @@ import { Message } from "./message.entity";
 import { Payment } from "./payment.entity";
 import { FreelancerProfile } from "./freelancer-profile.entity";
 import { Wallet } from "./wallet.entity";
+import { Transaction } from "./transaction.entity";
 
 export enum UserRole {
   FREELANCER = "freelancer",
@@ -104,4 +105,7 @@ export class User extends SoftDeletableEntity {
 
   @OneToMany(() => Payment, (p) => p.payer)
   payments: Payment[];
+
+  @OneToMany(() => Transaction, (t) => t.user)
+  transactions: Transaction[];
 }

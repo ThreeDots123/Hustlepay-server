@@ -17,6 +17,9 @@ import { PaystackService } from "./paystack.service";
 import { InitiatePaymentDto, PaymentMode } from "./dto/create-payment.dto";
 import { ContractService } from "src/contract/contract.service";
 import { FRONTEND_URL, PAYSTACK_SECRET_KEY } from "src/config/env";
+import { TransactionService } from "src/transaction/transaction.service";
+import { TransactionType } from "src/model/transaction.entity";
+import { Wallet } from "src/model/wallet.entity";
 
 @Injectable()
 export class PaymentService {
@@ -33,6 +36,7 @@ export class PaymentService {
     private readonly paystackService: PaystackService,
     private readonly configService: ConfigService,
     private readonly contractService: ContractService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   async initiatePayment(
@@ -321,7 +325,7 @@ export class PaymentService {
       // Find contract with relations
       const contract = await manager.findOne(Contract, {
         where: { id: data.contractId },
-        relations: ["proposal"],
+        relations: ["proposal", "client", "freelancer"],
       });
 
       if (!contract) {
@@ -451,6 +455,33 @@ export class PaymentService {
           metadata: verification.data.metadata,
         };
         await manager.save(payment);
+
+        // Create transaction records for client and freelancer
+        if (contract.client) {
+          // Client: Payment made and escrowed
+          await this.transactionService.createPaymentMadeTransaction(
+            contract.client,
+            payment,
+            contract,
+            data.milestoneId,
+          );
+          await this.transactionService.createEscrowedPaymentTransaction(
+            contract.client,
+            payment,
+            contract,
+            data.milestoneId,
+          );
+        }
+
+        if (contract.freelancer) {
+          // Freelancer: Funds escrowed
+          await this.transactionService.createEscrowedTransaction(
+            contract.freelancer,
+            payment,
+            contract,
+            data.milestoneId,
+          );
+        }
       }
 
       // Reload contract with updated relations
@@ -508,7 +539,7 @@ export class PaymentService {
         // Payment was made for a full contract instead, use the contractId
         contract = await manager.findOne(Contract, {
           where: { id: contractId },
-          relations: ["proposal"],
+          relations: ["proposal", "client", "freelancer"],
         });
         if (!contract) throw new NotFoundException("Contract not found");
 
@@ -522,7 +553,12 @@ export class PaymentService {
         // Payment was made for a milestone, use the milestoneId
         const milestone = await manager.findOne(Milestone, {
           where: { id: milestoneId },
-          relations: ["contract", "contract.proposal"],
+          relations: [
+            "contract",
+            "contract.proposal",
+            "contract.client",
+            "contract.freelancer",
+          ],
         });
 
         if (!milestone) throw new NotFoundException("Milestone not found");
@@ -544,6 +580,33 @@ export class PaymentService {
           verifiedAt: new Date().toISOString(),
         };
         await manager.save(payment);
+
+        // Create transaction records for client and freelancer
+        if (contract && contract.client) {
+          // Client: Payment made and escrowed
+          await this.transactionService.createPaymentMadeTransaction(
+            contract.client,
+            payment,
+            contract,
+            milestoneId,
+          );
+          await this.transactionService.createEscrowedPaymentTransaction(
+            contract.client,
+            payment,
+            contract,
+            milestoneId,
+          );
+        }
+
+        if (contract && contract.freelancer) {
+          // Freelancer: Funds escrowed
+          await this.transactionService.createEscrowedTransaction(
+            contract.freelancer,
+            payment,
+            contract,
+            milestoneId,
+          );
+        }
       }
 
       return {
@@ -582,11 +645,13 @@ export class PaymentService {
         metadata: { contractId, milestoneId = null },
       } = data.reference;
 
+      let contract: Contract | null = null;
+
       this.dataSource.transaction(async (manager) => {
         try {
           if (!milestoneId) {
             // Payment was made for a full contract instead, use the contractId
-            const contract = await manager.findOne(Contract, {
+            contract = await manager.findOne(Contract, {
               where: { id: contractId },
             });
 
@@ -618,6 +683,8 @@ export class PaymentService {
               throw new BadRequestException(
                 "Milestone is not in payment initiated status",
               );
+
+            contract = milestone.contract;
 
             milestone.status = MilestoneStatus.APPROVED;
             await manager.save(milestone);
@@ -652,6 +719,33 @@ export class PaymentService {
               verifiedAt: new Date().toISOString(),
             };
             await manager.save(payment);
+
+            // Create transaction records for client and freelancer
+            if (contract && contract.client) {
+              // Client: Payment made and escrowed
+              await this.transactionService.createPaymentMadeTransaction(
+                contract.client,
+                payment,
+                contract,
+                milestoneId,
+              );
+              await this.transactionService.createEscrowedPaymentTransaction(
+                contract.client,
+                payment,
+                contract,
+                milestoneId,
+              );
+            }
+
+            if (contract && contract.freelancer) {
+              // Freelancer: Funds escrowed
+              await this.transactionService.createEscrowedTransaction(
+                contract.freelancer,
+                payment,
+                contract,
+                milestoneId,
+              );
+            }
           }
         } catch (error) {
           this.logger.error(

@@ -19,6 +19,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { PaymentModule } from './payment/payment.module';
 import { MilestoneModule } from './milestone/milestone.module';
 import { DeliverableModule } from './deliverable/deliverable.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { DeliverableModule } from './deliverable/deliverable.module';
     PaymentModule,
     MilestoneModule,
     DeliverableModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

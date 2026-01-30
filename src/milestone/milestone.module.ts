@@ -8,12 +8,14 @@ import { Payment } from "src/model/payment.entity";
 import { Wallet } from "src/model/wallet.entity";
 import { UserModule } from "src/user/user.module";
 import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
+import { TransactionModule } from "src/transaction/transaction.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Milestone, Contract, Payment, Wallet]),
     forwardRef(() => UserModule),
     CloudinaryModule,
+    TransactionModule,
   ],
   providers: [MilestoneService],
   controllers: [MilestoneController],

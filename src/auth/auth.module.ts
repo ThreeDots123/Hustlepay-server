@@ -13,10 +13,11 @@ import { PasswordModule } from "src/password/password.module";
 import { ProfileModule } from "src/profile/profile.module";
 import { TokenModule } from "src/token/token.module";
 import { EmailModule } from "src/email/email.module";
+import { Wallet } from "src/model/wallet.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Wallet]),
     PassportModule,
     PasswordModule,
     ProfileModule,

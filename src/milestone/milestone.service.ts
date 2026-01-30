@@ -14,6 +14,7 @@ import { Wallet } from "src/model/wallet.entity";
 import { CreateMilestoneDto } from "./dto/create-milestone.dto";
 import { SubmitMilestoneDto } from "./dto/submit-milestone.dto";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { TransactionService } from "src/transaction/transaction.service";
 
 @Injectable()
 export class MilestoneService {
@@ -28,6 +29,7 @@ export class MilestoneService {
     @InjectRepository(Wallet)
     private readonly walletRepo: Repository<Wallet>,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   async createMilestone(
@@ -241,20 +243,21 @@ export class MilestoneService {
       }
 
       // Upload files to Cloudinary if any
-      let attachments: Array<{
-        id: string;
-        name: string;
-        type: "image" | "video" | "document" | "other";
-        size: number;
-        url: string;
-      }> | undefined;
+      let attachments:
+        | Array<{
+            id: string;
+            name: string;
+            type: "image" | "video" | "document" | "other";
+            size: number;
+            url: string;
+          }>
+        | undefined;
 
       if (files && files.length > 0) {
-        const uploadResults =
-          await this.cloudinaryService.uploadMultipleFiles(
-            files,
-            `milestones/${milestoneId}/submissions`,
-          );
+        const uploadResults = await this.cloudinaryService.uploadMultipleFiles(
+          files,
+          `milestones/${milestoneId}/submissions`,
+        );
 
         const getFileType = (
           mimeType: string,
@@ -304,7 +307,12 @@ export class MilestoneService {
       // Find milestone with contract relations
       const milestone = await manager.findOne(Milestone, {
         where: { id: milestoneId },
-        relations: ["contract", "contract.client", "parent"],
+        relations: [
+          "contract",
+          "contract.client",
+          "contract.freelancer",
+          "parent",
+        ],
       });
 
       if (!milestone) {
@@ -376,6 +384,21 @@ export class MilestoneService {
       // Update payment status to RELEASED
       milestonePayment.status = PaymentStatus.RELEASED;
       await manager.save(milestonePayment);
+
+      // Create transaction records
+      // Freelancer: Payment released and received
+      await this.transactionService.createPaymentReleasedTransaction(
+        milestone.contract.freelancer,
+        milestone,
+        milestonePayment,
+        wallet,
+      );
+      await this.transactionService.createPaymentReceivedTransaction(
+        milestone.contract.freelancer,
+        milestone,
+        milestonePayment,
+        wallet,
+      );
 
       // Update milestone status to COMPLETED
       milestone.status = MilestoneStatus.COMPLETED;
