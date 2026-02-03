@@ -20,6 +20,7 @@ import { PaymentModule } from './payment/payment.module';
 import { MilestoneModule } from './milestone/milestone.module';
 import { DeliverableModule } from './deliverable/deliverable.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { EarningModule } from './earning/earning.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { TransactionModule } from './transaction/transaction.module';
     MilestoneModule,
     DeliverableModule,
     TransactionModule,
+    EarningModule,
   ],
   controllers: [AppController],
   providers: [AppService],
