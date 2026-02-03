@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DataSource } from "typeorm";
+import { Repository, EntityManager } from "typeorm";
 import {
   Transaction,
   TransactionType,
@@ -9,8 +9,9 @@ import {
 import { User } from "src/model/user.entity";
 import { Contract } from "src/model/contract.entity";
 import { Milestone } from "src/model/milestone.entity";
-import { Payment } from "src/model/payment.entity";
+import { Payment, PaymentStatus } from "src/model/payment.entity";
 import { Wallet } from "src/model/wallet.entity";
+import BaseService from "src/interface/service/base.service";
 
 interface CreateTransactionDto {
   userId: string;
@@ -27,18 +28,26 @@ interface CreateTransactionDto {
 }
 
 @Injectable()
-export class TransactionService {
+export class TransactionService extends BaseService {
   constructor(
     @InjectRepository(Transaction)
     private readonly transactionRepo: Repository<Transaction>,
-    private dataSource: DataSource,
-  ) {}
+    @InjectRepository(Wallet)
+    private readonly walletRepo: Repository<Wallet>,
+    @InjectRepository(Payment)
+    private readonly paymentRepo: Repository<Payment>,
+  ) {
+    super();
+  }
 
   /**
    * Create a transaction record
    */
-  async createTransaction(dto: CreateTransactionDto): Promise<Transaction> {
-    const transaction = this.transactionRepo.create({
+  async createTransaction(
+    dto: CreateTransactionDto,
+    entityManager?: EntityManager,
+  ): Promise<Transaction> {
+    const transactionInstance = this.transactionRepo.create({
       userId: dto.userId,
       type: dto.type,
       amount: dto.amount,
@@ -54,15 +63,23 @@ export class TransactionService {
 
     // If this is a wallet-related transaction, calculate balance after
     if (dto.walletId) {
-      const wallet = await this.dataSource.manager.findOne(Wallet, {
-        where: { id: dto.walletId },
+      const wallet = await this.performEntityOps<Wallet, Wallet>({
+        repositoryManager: this.walletRepo,
+        transactionalEntity: entityManager,
+        action: "findOne",
+        opsArgs: [Wallet, { where: { id: dto.walletId } }],
       });
       if (wallet) {
-        transaction.balanceAfter = Number(wallet.balance);
+        transactionInstance.balanceAfter = Number(wallet.balance);
       }
     }
 
-    return await this.transactionRepo.save(transaction);
+    return await this.performEntityOps<Transaction, Transaction>({
+      repositoryManager: this.transactionRepo,
+      transactionalEntity: entityManager,
+      action: "save",
+      opsArgs: [transactionInstance],
+    });
   }
 
   /**
@@ -279,7 +296,7 @@ export class TransactionService {
       limit?: number;
       offset?: number;
     },
-  ): Promise<Transaction[]> {
+  ): Promise<{ transactions: Transaction[]; total: number }> {
     const query = this.transactionRepo
       .createQueryBuilder("transaction")
       .where("transaction.userId = :userId", { userId })
@@ -301,6 +318,10 @@ export class TransactionService {
       });
     }
 
+    // Get total count before applying limit/offset
+    const total = await query.getCount();
+
+    // Apply pagination
     if (filters?.limit) {
       query.limit(filters.limit);
     }
@@ -309,7 +330,9 @@ export class TransactionService {
       query.offset(filters.offset);
     }
 
-    return query.getMany();
+    const transactions = await query.getMany();
+
+    return { transactions, total };
   }
 
   /**
@@ -349,6 +372,69 @@ export class TransactionService {
       totalEscrowed,
       availableBalance: Math.max(0, availableBalance),
     };
+  }
+
+  /**
+   * Get total earnings for a user
+   */
+  async getTotalEarnings(userId: string): Promise<number> {
+    const transactions = await this.transactionRepo.find({
+      where: { userId, status: TransactionStatus.COMPLETED },
+    });
+
+    return transactions
+      .filter(
+        (t) =>
+          t.type === TransactionType.PAYMENT_RECEIVED ||
+          t.type === TransactionType.RELEASED,
+      )
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  /**
+   * Get total withdrawn for a user
+   */
+  async getTotalWithdrawn(userId: string): Promise<number> {
+    const transactions = await this.transactionRepo.find({
+      where: {
+        userId,
+        status: TransactionStatus.COMPLETED,
+        type: TransactionType.WITHDRAWN,
+      },
+    });
+
+    return transactions
+      .filter((t) => t.type === TransactionType.WITHDRAWN)
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  /**
+   * Get total escrowed for a freelancer
+   */
+  async getTotalEscrowed(userId: string): Promise<number> {
+    const payments = await this.paymentRepo
+      .createQueryBuilder("payment")
+      .leftJoinAndSelect("payment.contract", "contract")
+      .where("contract.freelancerId = :userId", { userId })
+      .andWhere("payment.status = :status", { status: PaymentStatus.ESCROWED })
+      .getMany();
+
+    return payments.reduce((sum, payment) => sum + payment.amount, 0);
+  }
+
+  /**
+   * Get available balance for a user from their wallet
+   */
+  async getAvailableBalance(userId: string): Promise<number> {
+    const wallet = await this.walletRepo.findOne({
+      where: { userId },
+    });
+
+    if (!wallet) {
+      return 0;
+    }
+
+    return Number(wallet.balance);
   }
 
   /**

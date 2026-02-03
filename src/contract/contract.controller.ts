@@ -222,7 +222,7 @@ export class ContractController {
   @ApiOperation({
     summary: "Get active contracts for freelancer",
     description:
-      "Retrieves all active contracts (active or awaiting_payment) for the authenticated freelancer.",
+      "Retrieves all active contracts (active or awaiting_payment or completed) for the authenticated freelancer.",
   })
   @ApiResponse({
     status: 200,
@@ -374,5 +374,98 @@ export class ContractController {
     });
 
     return this.svc.submitContract(user, contractId, dto, files || []);
+  }
+
+  @Post(":id/submit/approve")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Approve a submitted contract",
+    description:
+      "Approves a submitted full contract, releases escrowed payment to freelancer, and marks contract as completed.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Contract ID",
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Contract submission approved successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Contract cannot be approved",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not the contract owner",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Contract not found",
+  })
+  async approveSubmission(
+    @Param("id") contractId: string,
+    @Req() request: Request,
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.userService.findSingleUser({
+      where: { id },
+    });
+    return this.svc.approveContractSubmission(contractId, user.id);
+  }
+
+  @Post(":id/submit/reject")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Reject a submitted contract",
+    description:
+      "Rejects a submitted full contract, returns it to active status so freelancer can resubmit.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "Contract ID",
+    type: String,
+  })
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        reason: {
+          type: "string",
+          description: "Optional reason for rejection",
+        },
+      },
+    },
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Contract submission rejected successfully",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Contract cannot be rejected",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not the contract owner",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Contract not found",
+  })
+  async rejectSubmission(
+    @Param("id") contractId: string,
+    @Req() request: Request,
+    @Body() body?: { reason?: string },
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    const user = await this.userService.findSingleUser({
+      where: { id },
+    });
+    return this.svc.rejectContractSubmission(contractId, user.id, body?.reason);
   }
 }

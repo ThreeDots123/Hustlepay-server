@@ -32,21 +32,18 @@ export class TransactionController {
   ) {
     const userId = req.user.id;
 
-    const transactions = await this.transactionService.getUserTransactions(
-      userId,
-      {
-        type,
-        status,
-        contractId,
-        limit: limit ? Number(limit) : undefined,
-        offset: offset ? Number(offset) : undefined,
-      },
-    );
+    const result = await this.transactionService.getUserTransactions(userId, {
+      type,
+      status,
+      contractId,
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
+    });
 
     return {
-      status: "success",
-      data: transactions,
-      count: transactions.length,
+      transactions: result.transactions,
+      count: result.transactions.length,
+      total: result.total,
     };
   }
 
@@ -60,10 +57,59 @@ export class TransactionController {
     const summary =
       await this.transactionService.getUserTransactionSummary(userId);
 
-    return {
-      status: "success",
-      data: summary,
-    };
+    return summary;
+  }
+
+  /**
+   * Get total earnings for the authenticated user
+   */
+  @Get("summary/total-earnings")
+  async getTotalEarnings(@Request() req: any) {
+    const userId = req.user.id;
+
+    const totalEarnings =
+      await this.transactionService.getTotalEarnings(userId);
+
+    return { totalEarnings };
+  }
+
+  /**
+   * Get total withdrawn for the authenticated user
+   */
+  @Get("summary/total-withdrawn")
+  async getTotalWithdrawn(@Request() req: any) {
+    const userId = req.user.id;
+
+    const totalWithdrawn =
+      await this.transactionService.getTotalWithdrawn(userId);
+
+    return { totalWithdrawn };
+  }
+
+  /**
+   * Get total escrowed for the authenticated user
+   */
+  @Get("summary/total-escrowed")
+  async getTotalEscrowed(@Request() req: any) {
+    const userId = req.user.id;
+
+    const totalEscrowed =
+      await this.transactionService.getTotalEscrowed(userId);
+
+    return { totalEscrowed };
+  }
+
+  /**
+   * Get available balance for the authenticated user
+   */
+  @Get("summary/available-balance")
+  async getAvailableBalance(@Request() req: any) {
+    const userId = req.user.id;
+
+    const availableBalance =
+      await this.transactionService.getAvailableBalance(userId);
+
+    return { availableBalance };
   }
 
   /**
@@ -76,17 +122,14 @@ export class TransactionController {
   ) {
     const userId = req.user.id;
 
-    const transactions = await this.transactionService.getUserTransactions(
-      userId,
-      {
-        contractId,
-      },
-    );
+    const result = await this.transactionService.getUserTransactions(userId, {
+      contractId,
+    });
 
     return {
-      status: "success",
-      data: transactions,
-      count: transactions.length,
+      transactiions: result.transactions,
+      count: result.transactions.length,
+      total: result.total,
     };
   }
 }

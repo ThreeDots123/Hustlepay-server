@@ -1,13 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-  JoinColumn,
-} from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { User } from "./user.entity";
 import { Proposal } from "./proposal.entity";
 import { Bid } from "./bid.entity";
@@ -27,6 +18,7 @@ export enum ContractStatus {
   COMPLETED = "completed",
   CANCELLED = "cancelled",
   DISPUTED = "disputed",
+  SUBMITTED = "submitted",
 }
 
 @Entity({ name: "contract" })

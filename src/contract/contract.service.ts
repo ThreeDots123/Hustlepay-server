@@ -329,6 +329,8 @@ export class ContractService {
       where: [
         { freelancerId, status: ContractStatus.ACTIVE },
         { freelancerId, status: ContractStatus.AWAITING_PAYMENT },
+        { freelancerId, status: ContractStatus.SUBMITTED },
+        { freelancerId, status: ContractStatus.COMPLETED },
       ],
       relations: [
         "client",
@@ -562,7 +564,7 @@ export class ContractService {
     // Get contract and freelancer for transaction creation
     const contract = await manager.findOne(Contract, {
       where: { id: contractId },
-      relations: ["freelancer"],
+      relations: ["freelancer", "client"],
     });
 
     if (!contract)
@@ -571,6 +573,7 @@ export class ContractService {
       );
 
     const freelancer = contract.freelancer;
+    const client = contract.client;
 
     // Update payment statuses to RELEASED and create transactions
     for (const payment of fullPayments) {
@@ -580,36 +583,42 @@ export class ContractService {
       // Create transaction records for freelancer (full contract payment)
       if (freelancer && contract) {
         // For full contract payments, create transactions without milestone
-        await this.transactionService.createTransaction({
-          userId: freelancer.id,
-          type: TransactionType.RELEASED,
-          amount: payment.amount,
-          currency: payment.currency,
-          description: `Payment released for contract: ${contract.id}`,
-          contractId: contract.id,
-          paymentId: payment.id,
-          walletId: wallet.id,
-          metadata: {
-            paymentMode: "full",
-            providerPaymentId: payment.providerPaymentId,
+        await this.transactionService.createTransaction(
+          {
+            userId: client.id,
+            type: TransactionType.RELEASED,
+            amount: payment.amount,
+            currency: payment.currency,
+            description: `Payment released for contract: ${contract.id}`,
+            contractId: contract.id,
+            paymentId: payment.id,
+            walletId: wallet.id,
+            metadata: {
+              paymentMode: "full",
+              providerPaymentId: payment.providerPaymentId,
+            },
+            status: TransactionStatus.COMPLETED,
           },
-          status: TransactionStatus.COMPLETED,
-        });
-        await this.transactionService.createTransaction({
-          userId: freelancer.id,
-          type: TransactionType.PAYMENT_RECEIVED,
-          amount: payment.amount,
-          currency: payment.currency,
-          description: `Payment received for contract: ${contract.id}`,
-          contractId: contract.id,
-          paymentId: payment.id,
-          walletId: wallet.id,
-          metadata: {
-            paymentMode: "full",
-            providerPaymentId: payment.providerPaymentId,
+          manager,
+        );
+        await this.transactionService.createTransaction(
+          {
+            userId: freelancer.id,
+            type: TransactionType.PAYMENT_RECEIVED,
+            amount: payment.amount,
+            currency: payment.currency,
+            description: `Payment received for contract: ${contract.id}`,
+            contractId: contract.id,
+            paymentId: payment.id,
+            walletId: wallet.id,
+            metadata: {
+              paymentMode: "full",
+              providerPaymentId: payment.providerPaymentId,
+            },
+            status: TransactionStatus.COMPLETED,
           },
-          status: TransactionStatus.COMPLETED,
-        });
+          manager,
+        );
       }
     }
   }
@@ -705,13 +714,116 @@ export class ContractService {
       const submissionLinks =
         dto.links && dto.links.length > 0 ? dto.links.join("|") : undefined;
 
-      // Update contract with submission data
-      // Note: We don't change the contract status here - it remains ACTIVE
-      // The client will see the submission and can approve/reject it
+      // Update contract with submission data and change status to SUBMITTED
       contract.submissionDescription = dto.description;
       contract.submissionLinks = submissionLinks;
       contract.submissionAttachments = attachments;
+      contract.status = ContractStatus.SUBMITTED;
 
+      return await manager.save(contract);
+    });
+  }
+
+  /**
+   * Approve a submitted full contract
+   * Releases escrowed payment to freelancer and marks contract as completed
+   */
+  async approveContractSubmission(
+    contractId: string,
+    clientId: string,
+  ): Promise<Contract> {
+    return this.dataSource.transaction(async (manager) => {
+      const contract = await manager.findOne(Contract, {
+        where: { id: contractId, clientId },
+        relations: ["freelancer", "milestones"],
+      });
+
+      if (!contract) {
+        throw new NotFoundException("Contract not found");
+      }
+
+      // Verify contract belongs to client
+      if (contract.clientId !== clientId) {
+        throw new ForbiddenException(
+          "You can only approve contracts assigned to you",
+        );
+      }
+
+      // Verify contract is submitted
+      if (contract.status !== ContractStatus.SUBMITTED) {
+        throw new BadRequestException(
+          `Contract must be SUBMITTED to approve. Current status: ${contract.status}`,
+        );
+      }
+
+      // Verify this is a full contract (no child milestones)
+      const childMilestones =
+        contract.milestones?.filter((m) => m.parentId) || [];
+      if (childMilestones.length > 0) {
+        throw new BadRequestException(
+          "Cannot approve milestone-based contracts. Use milestone approval instead.",
+        );
+      }
+
+      // Release escrowed payments to freelancer wallet
+      await this.releaseContractPayments(
+        manager,
+        contractId,
+        contract.freelancerId,
+        contract.currency,
+      );
+
+      // Mark contract as completed
+      contract.status = ContractStatus.COMPLETED;
+      return await manager.save(contract);
+    });
+  }
+
+  /**
+   * Reject a submitted full contract
+   * Returns contract to active status so freelancer can resubmit
+   */
+  async rejectContractSubmission(
+    contractId: string,
+    clientId: string,
+    reason?: string,
+  ): Promise<Contract> {
+    return this.dataSource.transaction(async (manager) => {
+      const contract = await manager.findOne(Contract, {
+        where: { id: contractId, clientId },
+        relations: ["milestones"],
+      });
+
+      if (!contract) {
+        throw new NotFoundException("Contract not found");
+      }
+
+      // Verify contract belongs to client
+      if (contract.clientId !== clientId) {
+        throw new ForbiddenException(
+          "You can only reject contracts assigned to you",
+        );
+      }
+
+      // Verify contract is submitted
+      if (contract.status !== ContractStatus.SUBMITTED) {
+        throw new BadRequestException(
+          `Contract must be SUBMITTED to reject. Current status: ${contract.status}`,
+        );
+      }
+
+      // Verify this is a full contract (no child milestones)
+      const childMilestones =
+        contract.milestones?.filter((m) => m.parentId) || [];
+      if (childMilestones.length > 0) {
+        throw new BadRequestException(
+          "Cannot reject milestone-based contracts. Use milestone rejection instead.",
+        );
+      }
+
+      // Return contract to active status (freelancer can resubmit)
+      // Keep submission data for reference, but allow resubmission
+      contract.status = ContractStatus.ACTIVE;
       return await manager.save(contract);
     });
   }
