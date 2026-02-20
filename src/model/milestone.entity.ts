@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Contract } from "./contract.entity";
 import { Deliverable } from "./deliverable.entity";
-import { DbAwareColumn } from "src/utils/db-parse-column";
+import { DbAwareColumn, resolveDbType } from "src/utils/db-parse-column";
 import { BaseEntity } from "src/interface/model/base.entity";
 
 export enum MilestoneStatus {
@@ -72,8 +72,15 @@ export class Milestone extends BaseEntity {
   })
   status: MilestoneStatus;
 
-  @Column({ type: "timestamp", nullable: true })
-  dueDate?: Date;
+  @Column({
+    type: resolveDbType("timestamptz"),
+    name: "started_at",
+    nullable: true,
+  })
+  startedAt?: Date;
+
+  @Column({ type: "int", nullable: true, name: "duration_days" })
+  durationDays: number;
 
   @DbAwareColumn({
     type: "jsonb",

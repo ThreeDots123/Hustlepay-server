@@ -3,7 +3,7 @@ export default function userWelcomeMail(name: string, currentYear: number) {
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Welcome to HustlePay</title>
+    <title>Welcome to Wokit</title>
   </head>
   <body style="font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px;">
     <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden;">
@@ -14,7 +14,7 @@ export default function userWelcomeMail(name: string, currentYear: number) {
       </tr>
       <tr>
         <td style="padding: 30px; color: #333;">
-          <p>We’re excited to have you on <strong>HustlePay</strong>!</p>
+          <p>We’re excited to have you on <strong>Wokit</strong>!</p>
           <p>Here’s what you can do right away:</p>
           <ul>
             <li>👉 Complete your profile</li>
@@ -27,12 +27,12 @@ export default function userWelcomeMail(name: string, currentYear: number) {
             </a>
           </p>
           <p>If you need help, our support team is just a click away.</p>
-          <p>Happy working!<br/>The HustlePay Team</p>
+          <p>Happy working!<br/>The Wokit Team</p>
         </td>
       </tr>
       <tr>
         <td style="background: #f4f6f9; padding: 15px; text-align: center; font-size: 12px; color: #999;">
-          &copy; ${currentYear} HustlePay. All rights reserved.
+          &copy; ${currentYear} Wokit. All rights reserved.
         </td>
       </tr>
     </table>

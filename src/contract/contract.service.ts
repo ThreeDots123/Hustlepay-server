@@ -324,26 +324,37 @@ export class ContractService {
   // ✅ Get active contracts for freelancer (active or awaiting_payment)
   async findActiveContractsForFreelancer(
     freelancerId: string,
+    page?: number,
+    limit?: number,
   ): Promise<Contract[]> {
-    return this.contractRepo.find({
-      where: [
-        { freelancerId, status: ContractStatus.ACTIVE },
-        { freelancerId, status: ContractStatus.AWAITING_PAYMENT },
-        { freelancerId, status: ContractStatus.SUBMITTED },
-        { freelancerId, status: ContractStatus.COMPLETED },
-      ],
-      relations: [
-        "client",
-        "proposal",
-        "proposal.skills",
-        "proposal.categories",
-        "bid",
-        "milestones",
-        "milestones.deliverables",
-        // "milestones.children",
-      ],
-      order: { createdAt: "DESC" },
-    });
+    const queryBuilder = this.contractRepo
+      .createQueryBuilder("contract")
+      .where("contract.freelancer_id = :freelancerId", { freelancerId })
+      .andWhere("contract.user_status IN (:...statuses)", {
+        statuses: [
+          ContractStatus.ACTIVE,
+          ContractStatus.AWAITING_PAYMENT,
+          ContractStatus.SUBMITTED,
+          // ContractStatus.COMPLETED,
+        ],
+      })
+      .leftJoinAndSelect("contract.client", "client")
+      .leftJoinAndSelect("contract.proposal", "proposal")
+      .leftJoinAndSelect("proposal.skills", "proposalSkills")
+      .leftJoinAndSelect("proposal.categories", "proposalCategories")
+      .leftJoinAndSelect("contract.bid", "bid")
+      .leftJoinAndSelect("contract.milestones", "milestones")
+      .leftJoinAndSelect("milestones.deliverables", "milestonesDeliverables")
+      .orderBy("contract.created_at", "DESC");
+
+    if (limit !== undefined) {
+      queryBuilder.limit(limit);
+      if (page !== undefined && page > 0) {
+        queryBuilder.offset((page - 1) * limit);
+      }
+    }
+
+    return queryBuilder.getMany();
   }
 
   // ✅ Get completed contracts for freelancer
@@ -381,6 +392,55 @@ export class ContractService {
       ],
       order: { createdAt: "DESC" },
     });
+  }
+
+  /**
+   * Client dashboard stats: amount spent (completed contracts + released/completed milestones) and active hires count.
+   */
+  async getClientDashboardStats(clientId: string): Promise<{
+    amountSpent: number;
+    activeContractsCount: number;
+  }> {
+    const [amountSpentResult, activeCount] = await Promise.all([
+      this.getClientAmountSpent(clientId),
+      this.contractRepo.count({
+        where: [
+          { clientId, status: ContractStatus.ACTIVE },
+          { clientId, status: ContractStatus.AWAITING_PAYMENT },
+          { clientId, status: ContractStatus.PAYMENT_INITIATED },
+        ],
+      }),
+    ]);
+
+    return {
+      amountSpent: amountSpentResult,
+      activeContractsCount: activeCount,
+    };
+  }
+
+  private async getClientAmountSpent(clientId: string): Promise<number> {
+    const completedContractSum = await this.contractRepo
+      .createQueryBuilder("c")
+      .select("COALESCE(SUM(c.amount), 0)", "total")
+      .where("c.client_id = :clientId", { clientId })
+      .andWhere("c.user_status = :status", {
+        status: ContractStatus.COMPLETED,
+      })
+      .getRawOne<{ total: string }>();
+
+    const releasedMilestonesSum = await this.milestoneRepo
+      .createQueryBuilder("m")
+      .innerJoin("m.contract", "c")
+      .select("COALESCE(SUM(m.amount), 0)", "total")
+      .where("c.client_id = :clientId", { clientId })
+      .andWhere("m.user_status IN (:...statuses)", {
+        statuses: [MilestoneStatus.COMPLETED, MilestoneStatus.RELEASED],
+      })
+      .getRawOne<{ total: string }>();
+
+    const fromContracts = Number(completedContractSum?.total ?? 0);
+    const fromMilestones = Number(releasedMilestonesSum?.total ?? 0);
+    return fromContracts + fromMilestones;
   }
 
   /**
@@ -735,7 +795,7 @@ export class ContractService {
     return this.dataSource.transaction(async (manager) => {
       const contract = await manager.findOne(Contract, {
         where: { id: contractId, clientId },
-        relations: ["freelancer", "milestones"],
+        relations: ["freelancer", "milestones", "proposal"],
       });
 
       if (!contract) {
@@ -772,6 +832,13 @@ export class ContractService {
         contract.freelancerId,
         contract.currency,
       );
+
+      // Mark Proposal as completed
+      if (contract.proposal) {
+        contract.proposal.status = ProposalStatus.CLOSED;
+        await manager.save(contract.proposal);
+      }
+      await manager.save(contract.proposal);
 
       // Mark contract as completed
       contract.status = ContractStatus.COMPLETED;

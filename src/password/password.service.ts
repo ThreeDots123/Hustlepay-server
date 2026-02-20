@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { EntityManager, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcrypt";
@@ -9,15 +9,22 @@ import { UsersService } from "src/user/user.service";
 import { TokenService } from "src/token/token.service";
 import { OtpPurpose } from "src/model/otp.entity";
 import { EmailService } from "src/email/email.service";
+import { ConfigService } from "@nestjs/config";
+import { FRONTEND_URL } from "src/config/env";
+
+const PASSWORD_RESET_EXPIRY_MINUTES = 5;
 
 @Injectable()
 export class PasswordService extends BaseService {
+  private readonly logger = new Logger(PasswordService.name);
+
   constructor(
     @InjectRepository(PasswordEntity)
     private passwordRepository: Repository<PasswordEntity>,
     private usersService: UsersService,
     private tokenService: TokenService,
     private emailService: EmailService,
+    private configService: ConfigService,
   ) {
     super();
   }
@@ -60,15 +67,43 @@ export class PasswordService extends BaseService {
       const otp = await this.tokenService.createOtp({
         userId: user.id,
         purpose: OtpPurpose.PASSWORD_RESET,
-        expiresInMinutes: 1,
+        expiresInMinutes: PASSWORD_RESET_EXPIRY_MINUTES,
+        withResetToken: true,
       });
 
-      await this.emailService.sendPasswordReset(
-        { fullName: user.firstname, otpCode: otp.code },
-        user.email,
-        "Password Reset Request",
+      const baseUrl =
+        this.configService.get<string>(FRONTEND_URL) || "http://localhost:3000";
+      const resetUrl = `${baseUrl}/account/reset-password?token=${encodeURIComponent(otp.token!)}`;
+      this.logger.log(
+        `[Password Reset] Reset URL for ${email} (valid ${PASSWORD_RESET_EXPIRY_MINUTES} min): ${resetUrl}`,
       );
+
+      // await this.emailService.sendPasswordReset(
+      //   { fullName: user.firstname, otpCode: otp.code },
+      //   user.email,
+      //   "Password Reset Request",
+      // );
     }
+  }
+
+  async validateResetToken(token: string): Promise<{ valid: boolean }> {
+    const otp = await this.tokenService.findPasswordResetByToken(token);
+    return { valid: !!otp };
+  }
+
+  async completePasswordResetWithToken(token: string, newPassword: string) {
+    const otp = await this.tokenService.findPasswordResetByToken(token);
+    if (!otp) {
+      throw new BadRequestException("Invalid or expired reset link.");
+    }
+
+    const hashedPw = await this.hashPassword(newPassword);
+    await this.passwordRepository.update(
+      { userId: otp.userId },
+      { key: hashedPw },
+    );
+
+    await this.tokenService.markOtpUsed(otp);
   }
 
   async completePasswordReset(data: {

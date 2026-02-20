@@ -44,7 +44,7 @@ export class EmailService {
       apiKey: apiKey,
       secretKey: secretKey,
       fromEmail: noReplyAddress,
-      fromName: "HustlePay",
+      fromName: "Wokit",
     };
 
     this.mailjet = (Mailjet as any).apiConnect(

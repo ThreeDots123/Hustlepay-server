@@ -1,13 +1,15 @@
-import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Query } from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBody,
+  ApiQuery,
 } from "@nestjs/swagger";
 import { PasswordService } from "./password.service";
 import {
   CompletePasswordResetDto,
+  CompletePasswordResetWithTokenDto,
   InitiatePasswordResetDto,
 } from "./dto/password-reset.dto";
 
@@ -39,7 +41,8 @@ export class PasswordController {
         },
         message: {
           type: "string",
-          example: "If this email exists, you will receive a password reset OTP.",
+          example:
+            "If this email exists, you will receive a password reset OTP.",
         },
       },
     },
@@ -87,7 +90,8 @@ export class PasswordController {
   })
   @ApiResponse({
     status: 400,
-    description: "Validation error - Invalid OTP, expired OTP, or weak password",
+    description:
+      "Validation error - Invalid OTP, expired OTP, or weak password",
   })
   @ApiResponse({
     status: 404,
@@ -96,6 +100,68 @@ export class PasswordController {
   async completePasswordReset(@Body() _body: CompletePasswordResetDto) {
     await this.passwordService.completePasswordReset(_body);
 
+    return {
+      success: true,
+      message: "Password reset successful",
+    };
+  }
+
+  @Get("reset/validate")
+  @ApiOperation({
+    summary: "Validate reset token",
+    description:
+      "Checks if the token from the reset link is valid and not expired.",
+  })
+  @ApiQuery({
+    name: "token",
+    required: true,
+    description: "Reset token from the password reset URL",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Token validation result",
+    schema: {
+      type: "object",
+      properties: {
+        valid: { type: "boolean" },
+      },
+    },
+  })
+  async validateResetToken(@Query("token") token: string) {
+    const result = await this.passwordService.validateResetToken(token);
+    return result;
+  }
+
+  @Post("reset/complete-with-token")
+  @HttpCode(200)
+  @ApiOperation({
+    summary: "Complete password reset with token",
+    description:
+      "Completes the password reset using the token from the reset link.",
+  })
+  @ApiBody({ type: CompletePasswordResetWithTokenDto })
+  @ApiResponse({
+    status: 200,
+    description: "Password reset successful",
+    schema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", example: true },
+        message: { type: "string", example: "Password reset successful" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid or expired token",
+  })
+  async completePasswordResetWithToken(
+    @Body() body: CompletePasswordResetWithTokenDto,
+  ) {
+    await this.passwordService.completePasswordResetWithToken(
+      body.token,
+      body.newPassword,
+    );
     return {
       success: true,
       message: "Password reset successful",

@@ -227,17 +227,31 @@ export class BidService {
   }
 
   // ✅ Get all bids for a freelancer
-  async findByFreelancer(freelancerId: string) {
-    return this.bidRepo.find({
-      where: { freelancerId, status: BidStatus.PENDING },
-      relations: [
-        "proposal",
-        "proposal.client",
-        "proposal.skills",
-        "proposal.categories",
-      ],
-      order: { createdAt: "DESC" },
-    });
+  async findByFreelancer(freelancerId: string, page?: number, limit?: number) {
+    const queryBuilder = this.bidRepo
+      .createQueryBuilder("bid")
+      .where("bid.freelancer_id = :freelancerId", { freelancerId })
+      .andWhere("bid.status IN (:...statuses)", {
+        statuses: [
+          BidStatus.PENDING,
+          // BidStatus.ACCEPTED,
+          BidStatus.REJECTED,
+        ],
+      })
+      .leftJoinAndSelect("bid.proposal", "proposal")
+      .leftJoinAndSelect("proposal.client", "proposalClient")
+      .leftJoinAndSelect("proposal.skills", "proposalSkills")
+      .leftJoinAndSelect("proposal.categories", "proposalCategories")
+      .orderBy("bid.created_at", "DESC");
+
+    if (limit !== undefined) {
+      queryBuilder.limit(limit);
+      if (page !== undefined && page > 0) {
+        queryBuilder.offset((page - 1) * limit);
+      }
+    }
+
+    return queryBuilder.getMany();
   }
 
   // ✅ Get count of active (pending) bids for freelancer

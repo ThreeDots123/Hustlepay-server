@@ -5,7 +5,7 @@ import { Bid } from "./bid.entity";
 import { Milestone } from "./milestone.entity";
 import { Payment } from "./payment.entity";
 import { Deliverable } from "./deliverable.entity";
-import { DbAwareColumn } from "src/utils/db-parse-column";
+import { DbAwareColumn, resolveDbType } from "src/utils/db-parse-column";
 import { SoftDeletableEntity } from "src/interface/model/soft-deletable.entity";
 import { BidRateType } from "./bid.entity";
 
@@ -67,8 +67,16 @@ export class Contract extends SoftDeletableEntity {
   currency: string;
 
   // Duration in days - from bid's proposedDurationDays or proposal's durationEstimateDays
-  @Column({ type: "int", nullable: true })
+  @Column({ type: "int", nullable: true, name: "duration_days" })
   durationDays?: number;
+
+  // Start date column to record when the project was started
+  @Column({
+    type: resolveDbType("timestamptz"),
+    name: "started_at",
+    nullable: true,
+  })
+  startedAt?: Date;
 
   // Rate type - from bid's rateType (if from bid) or default to FIXED (if from proposal)
   @DbAwareColumn({

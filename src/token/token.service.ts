@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import BaseService from "src/interface/service/base.service";
@@ -19,6 +20,7 @@ export class TokenService extends BaseService {
       purpose: OtpPurpose;
       expiresInMinutes?: number;
       maxAttempts?: number;
+      withResetToken?: boolean;
     },
     transactionalEntity?: EntityManager,
   ) {
@@ -30,11 +32,17 @@ export class TokenService extends BaseService {
     // Generate 6-digit OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+    const token =
+      data.purpose === OtpPurpose.PASSWORD_RESET && data.withResetToken
+        ? crypto.randomBytes(32).toString("hex")
+        : undefined;
+
     console.log("OTP:", data.purpose, "- ", code);
 
     const otpInstance = this.otpRepository.create({
       userId: data.userId,
       code,
+      token,
       purpose: data.purpose,
       expiresAt,
       maxAttempts: data.maxAttempts || 3, // Default 3 attempts
@@ -47,6 +55,35 @@ export class TokenService extends BaseService {
       action: "save",
       opsArgs: [otpInstance],
     });
+  }
+
+  async findPasswordResetByToken(
+    token: string,
+    transactionalEntity?: EntityManager,
+  ): Promise<OtpEntity | null> {
+    const otp = await this.performEntityOps<OtpEntity, OtpEntity | null>({
+      repositoryManager: this.otpRepository,
+      transactionalEntity,
+      action: "findOne",
+      opsArgs: [
+        OtpEntity,
+        {
+          where: {
+            token,
+            purpose: OtpPurpose.PASSWORD_RESET,
+            used: false,
+          },
+        },
+      ],
+    });
+    console.log("OTP:", otp?.isExpired());
+    if (!otp || otp.isExpired()) return null;
+    return otp;
+  }
+
+  async markOtpUsed(otp: OtpEntity) {
+    otp.used = true;
+    await this.otpRepository.save(otp);
   }
 
   async verifyOtp(
