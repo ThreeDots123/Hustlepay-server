@@ -19,6 +19,9 @@ export class Otp extends BaseEntity {
   @Column()
   code: string;
 
+  @Column({ nullable: true, unique: true })
+  token?: string;
+
   @Column({
     type: "enum",
     enum: OtpPurpose,

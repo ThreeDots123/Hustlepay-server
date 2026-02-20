@@ -9,7 +9,7 @@ export default function verifyEmail(currentYear: number, otpCode: string) {
     <table width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden;">
       <tr>
         <td style="padding: 20px; text-align: center; background: #2d89ef; color: #fff;">
-          <h2>Welcome to HustlePay!</h2>
+          <h2>Welcome to Wokit!</h2>
         </td>
       </tr>
       <tr>
@@ -23,12 +23,12 @@ export default function verifyEmail(currentYear: number, otpCode: string) {
           </p>
           <p>If the button doesn’t work, copy and paste this link into your browser:</p>
           <p style="word-break: break-all; color: #2d89ef;">{{verificationUrl}}</p>
-          <p>Cheers,<br/>The HustlePay Team</p>
+          <p>Cheers,<br/>The Wokit Team</p>
         </td>
       </tr>
       <tr>
         <td style="background: #f4f6f9; padding: 15px; text-align: center; font-size: 12px; color: #999;">
-          &copy; ${currentYear}. HustlePay. All rights reserved.
+          &copy; ${currentYear}. Wokit. All rights reserved.
         </td>
       </tr>
     </table>

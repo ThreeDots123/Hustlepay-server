@@ -415,14 +415,15 @@ export class PaymentService {
         metadata: { contractId, milestoneId = null },
       } = verification.data;
 
-      // Update contract or milestone status based on payment type
+      // Update contract or milestone status and start date based on payment type
       if (!milestoneId) {
         // Full contract payment
         if (contract.status === ContractStatus.PAYMENT_INITIATED) {
           contract.status = ContractStatus.ACTIVE;
+          contract.startedAt = new Date();
           await manager.save(contract);
           this.logger.log(
-            `Contract ${contract.id} activated after payment verification`,
+            `Contract ${contract.id} activated and start date set after payment verification`,
           );
         }
       } else {
@@ -438,10 +439,19 @@ export class PaymentService {
 
         if (milestone.status === MilestoneStatus.PAYMENT_INITIATED) {
           milestone.status = MilestoneStatus.APPROVED;
+          milestone.startedAt = new Date();
           await manager.save(milestone);
           this.logger.log(
-            `Milestone ${milestone.id} approved after payment verification`,
+            `Milestone ${milestone.id} approved and start date set after payment verification`,
           );
+          // Set contract start date if not already set (first milestone payment)
+          if (!contract.startedAt) {
+            contract.startedAt = new Date();
+            await manager.save(contract);
+            this.logger.log(
+              `Contract ${contract.id} start date set on first milestone payment`,
+            );
+          }
         }
       }
 
@@ -545,6 +555,7 @@ export class PaymentService {
 
         if (contract.status === ContractStatus.PAYMENT_INITIATED) {
           contract.status = ContractStatus.ACTIVE;
+          contract.startedAt = new Date();
           await manager.save(contract);
         }
       }
@@ -567,7 +578,12 @@ export class PaymentService {
 
         if (milestone.status === MilestoneStatus.PAYMENT_INITIATED) {
           milestone.status = MilestoneStatus.APPROVED;
+          milestone.startedAt = new Date();
           await manager.save(milestone);
+          if (!contract.startedAt) {
+            contract.startedAt = new Date();
+            await manager.save(contract);
+          }
         }
       }
 
@@ -663,8 +679,11 @@ export class PaymentService {
               );
 
             contract.status = ContractStatus.ACTIVE;
+            contract.startedAt = new Date();
             await manager.save(contract);
-            this.logger.log(`Contract ${contract.id} activated after payment`);
+            this.logger.log(
+              `Contract ${contract.id} activated and start date set after payment`,
+            );
           } else {
             // Payment was made for a milestone, use the milestoneId
             const milestone = await manager.findOne(Milestone, {
@@ -687,11 +706,19 @@ export class PaymentService {
             contract = milestone.contract;
 
             milestone.status = MilestoneStatus.APPROVED;
+            milestone.startedAt = new Date();
             await manager.save(milestone);
 
             this.logger.log(
-              `Milestone ${milestone.id} marked as payment success`,
+              `Milestone ${milestone.id} marked as payment success and start date set`,
             );
+            if (!contract.startedAt) {
+              contract.startedAt = new Date();
+              await manager.save(contract);
+              this.logger.log(
+                `Contract ${contract.id} start date set on first milestone payment`,
+              );
+            }
           }
 
           // Handle Payment....

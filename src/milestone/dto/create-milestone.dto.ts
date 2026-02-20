@@ -51,11 +51,11 @@ export class CreateMilestoneDto {
   amount: number;
 
   @ApiProperty({
-    description: "Due date for the milestone (optional)",
-    example: "2024-12-31T23:59:59Z",
+    description: "Duration days for the milestone (optional)",
+    example: 10,
     required: false,
   })
   @IsOptional()
-  @IsDateString()
-  dueDate?: string;
+  @IsInt()
+  durationDays?: number;
 }

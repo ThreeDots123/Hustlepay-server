@@ -113,7 +113,7 @@ export class MilestoneService {
           description: dto.description,
           amount: dto.amount,
           status: MilestoneStatus.PENDING,
-          dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+          durationDays: dto.durationDays,
         });
 
         return await manager.save(childMilestone);
@@ -144,7 +144,6 @@ export class MilestoneService {
           description: dto.description,
           amount: dto.amount,
           status: MilestoneStatus.PENDING_ACCEPTANCE, // Waiting for freelancer to accept
-          dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
         });
 
         return await manager.save(parentMilestone);

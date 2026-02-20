@@ -477,7 +477,7 @@ export class UsersController {
   @ApiOperation({
     summary: "Get all bids for freelancer",
     description:
-      "Retrieves all bids submitted by the authenticated freelancer, including proposal details.",
+      "Retrieves all bids submitted by the authenticated freelancer, including proposal details, with pagination support.",
   })
   @ApiResponse({
     status: 200,
@@ -491,9 +491,17 @@ export class UsersController {
     status: 403,
     description: "Forbidden - User is not a freelancer",
   })
-  async getMyBids(@Req() request: Request) {
+  async getMyBids(
+    @Req() request: Request,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ) {
     const { id } = request.user as AuthorisedRequest;
-    return this.bidService.findByFreelancer(id);
+    return this.bidService.findByFreelancer(
+      id,
+      page ? Number(page) : undefined,
+      limit ? Number(limit) : undefined,
+    );
   }
 
   @Get("freelancer/stats/active-bids")

@@ -6,6 +6,7 @@ import {
   Req,
   Param,
   Get,
+  Query,
   UseInterceptors,
   UploadedFiles,
   ParseFilePipe,
@@ -222,7 +223,7 @@ export class ContractController {
   @ApiOperation({
     summary: "Get active contracts for freelancer",
     description:
-      "Retrieves all active contracts (active or awaiting_payment or completed) for the authenticated freelancer.",
+      "Retrieves all active contracts (active or awaiting_payment or completed) for the authenticated freelancer with pagination support.",
   })
   @ApiResponse({
     status: 200,
@@ -236,9 +237,17 @@ export class ContractController {
     status: 403,
     description: "Forbidden - User is not a freelancer",
   })
-  async getActiveContracts(@Req() request: Request) {
+  async getActiveContracts(
+    @Req() request: Request,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ) {
     const { id } = request.user as AuthorisedRequest;
-    return this.svc.findActiveContractsForFreelancer(id);
+    return this.svc.findActiveContractsForFreelancer(
+      id,
+      page ? Number(page) : undefined,
+      limit ? Number(limit) : undefined,
+    );
   }
 
   @Get("freelancer/completed")
@@ -264,6 +273,31 @@ export class ContractController {
   async getCompletedContracts(@Req() request: Request) {
     const { id } = request.user as AuthorisedRequest;
     return this.svc.findCompletedContractsForFreelancer(id);
+  }
+
+  @Get("client/stats")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get client dashboard stats",
+    description:
+      "Returns amount spent (completed contracts + released/completed milestones) and number of active contracts (hires) for the authenticated client.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Dashboard stats retrieved successfully",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized - Invalid or missing JWT token",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User is not a client",
+  })
+  async getClientDashboardStats(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.svc.getClientDashboardStats(id);
   }
 
   @Get("client/active")

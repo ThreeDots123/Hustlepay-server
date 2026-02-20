@@ -54,7 +54,7 @@ export class UserCreatedEventSubscriber {
         this.emailService.sendUserWelcomeEmail(
           event.name,
           event.email,
-          "Welcome to Hustlepay - ",
+          "Welcome to Wokit - ",
           new Date().getFullYear(),
         ),
         this.emailService.verifyEmail(
