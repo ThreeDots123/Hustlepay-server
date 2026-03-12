@@ -8,12 +8,14 @@ import { User } from "src/model/user.entity";
 import { Contract } from "src/model/contract.entity";
 import { UserModule } from "src/user/user.module";
 import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Bid, Proposal, User, Contract]),
     forwardRef(() => UserModule),
     CloudinaryModule,
+    forwardRef(() => AuthModule),
   ],
   providers: [BidService],
   controllers: [BidController, ClientBidsController],

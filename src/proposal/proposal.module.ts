@@ -3,6 +3,7 @@ import { ProposalService } from "./proposal.service";
 import { ProposalController } from "./proposal.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "src/user/user.module";
+import { AuthModule } from "src/auth/auth.module";
 import { SkillCatalog } from "src/model/skill-catalog.entity";
 import { CategoryCatalog } from "src/model/category-catalog.entity";
 import { Proposal } from "src/model/proposal.entity";
@@ -13,6 +14,7 @@ import { Contract } from "src/model/contract.entity";
   imports: [
     TypeOrmModule.forFeature([Proposal, SkillCatalog, CategoryCatalog, Bid, Contract]),
     UserModule,
+    AuthModule,
   ],
   providers: [ProposalService],
   controllers: [ProposalController],

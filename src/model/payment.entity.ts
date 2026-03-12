@@ -37,6 +37,14 @@ export class Payment extends SoftDeletableEntity {
   @Column({ type: "int" })
   amount: number;
 
+  /** Subtotal (contract/milestone amount) before platform fee. Same unit as amount. */
+  @Column({ type: "int", nullable: true, name: "subtotal_amount" })
+  subtotalAmount?: number;
+
+  /** Platform fee charged for this payment (profit). Same unit as amount. */
+  @Column({ type: "int", nullable: true, name: "platform_fee_amount" })
+  platformFeeAmount?: number;
+
   @Column({ length: 10, default: "ngn" })
   currency: string;
 

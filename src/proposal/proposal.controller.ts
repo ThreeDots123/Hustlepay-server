@@ -26,7 +26,7 @@ import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import { request, Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
 import { UsersService } from "src/user/user.service";
-import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { ActiveFreelancerGuard } from "src/auth/guards/user-roles/active-freelancer.guard";
 
 @ApiTags("Proposals")
 @Controller("proposals")
@@ -517,7 +517,7 @@ export class ProposalController {
   }
 
   @Get("/freelancer/:slug")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get proposal details (freelancer view)",
@@ -555,7 +555,7 @@ export class ProposalController {
   }
 
   @Post(":id/accept")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Accept a proposal directly",

@@ -36,12 +36,17 @@ import { UserRole } from "src/model/user.entity";
 import { AuthorisedRequest } from "src/common/types";
 import { ClientProfileDto } from "src/profile/dto/client-profile.dto";
 import { UpdateFreelancerProfileDto } from "src/profile/dto/update-freelancer-profile.dto";
-import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { ActiveFreelancerGuard } from "src/auth/guards/user-roles/active-freelancer.guard";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import transformToAuthenticatedUser from "src/transformers/authenticated-user";
 import { BidService } from "src/bid/bid.service";
 import { UpdateBidDto } from "src/bid/dto/update-bid.dto";
 import { ContractService } from "src/contract/contract.service";
+import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { FreelancerProofLinkService } from "./freelancer-proof-link.service";
+import {
+  SubmitActivationProofLinksDto,
+} from "./dto/activation-proof-links.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -51,6 +56,7 @@ export class UsersController {
     private profileService: ProfileService,
     private bidService: BidService,
     private contractService: ContractService,
+    private readonly freelancerProofLinkService: FreelancerProofLinkService,
   ) {}
 
   @UseGuards(IsFreelancerGuard)
@@ -331,6 +337,40 @@ export class UsersController {
     return transformToAuthenticatedUser(user);
   }
 
+  @UseGuards(IsFreelancerGuard)
+  @Get("freelancer/activation-proof")
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get activation proof links",
+    description:
+      "Returns the proof links (portfolio, social, etc.) the freelancer has submitted for activation. Use IsFreelancerGuard so pending freelancers can call it.",
+  })
+  @ApiResponse({ status: 200, description: "Proof links returned." })
+  @ApiResponse({ status: 401, description: "Unauthorized." })
+  async getActivationProofLinks(@Req() request: Request) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.freelancerProofLinkService.findByUserId(id);
+  }
+
+  @UseGuards(IsFreelancerGuard)
+  @Post("freelancer/activation-proof")
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Submit activation proof links",
+    description:
+      "Submit or replace proof links (portfolio, social, etc.) for activation. At least one link required. Use IsFreelancerGuard so pending freelancers can call it.",
+  })
+  @ApiResponse({ status: 201, description: "Proof links saved." })
+  @ApiResponse({ status: 400, description: "Validation error (e.g. invalid URL, empty list)." })
+  @ApiResponse({ status: 401, description: "Unauthorized." })
+  async submitActivationProofLinks(
+    @Req() request: Request,
+    @Body() body: SubmitActivationProofLinksDto,
+  ) {
+    const { id } = request.user as AuthorisedRequest;
+    return this.freelancerProofLinkService.replaceForUser(id, body.links);
+  }
+
   @UseGuards(IsClientGuard)
   @Get("freelancers")
   @ApiBearerAuth("JWT-auth")
@@ -472,7 +512,7 @@ export class UsersController {
   }
 
   @Get("my-bids")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get all bids for freelancer",
@@ -505,7 +545,7 @@ export class UsersController {
   }
 
   @Get("freelancer/stats/active-bids")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get count of active bids for freelancer",
@@ -537,7 +577,7 @@ export class UsersController {
   }
 
   @Get("freelancer/stats/jobs-in-progress")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get count of jobs in progress for freelancer",
@@ -570,7 +610,7 @@ export class UsersController {
   }
 
   @Get("freelancer/stats/jobs-completed")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get count of completed jobs for freelancer",
@@ -603,7 +643,7 @@ export class UsersController {
   }
 
   @Get("freelancer/stats/total-revenue")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get total revenue for freelancer",
@@ -635,7 +675,7 @@ export class UsersController {
   }
 
   @Patch("bids/:id")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @UseInterceptors(FilesInterceptor("attachments", 10))
   @ApiBearerAuth("JWT-auth")
   @ApiConsumes("multipart/form-data")
@@ -744,12 +784,13 @@ export class UsersController {
     return this.bidService.update(bidId, id, dto, files || []);
   }
 
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @Get("freelancer/wallet/check")
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Check if freelancer has a wallet",
-    description: "Returns whether the authenticated freelancer has a wallet created (i.e., has completed at least one project or milestone).",
+    description:
+      "Returns whether the authenticated freelancer has a wallet created (i.e., has completed at least one project or milestone).",
   })
   @ApiResponse({
     status: 200,

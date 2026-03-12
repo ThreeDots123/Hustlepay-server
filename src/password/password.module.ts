@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { PasswordService } from "./password.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Password } from "src/model/user-password.entity";
@@ -11,7 +11,7 @@ import { TokenModule } from "src/token/token.module";
   imports: [
     TypeOrmModule.forFeature([Password]),
     EmailModule,
-    UserModule,
+    forwardRef(() => UserModule),
     TokenModule,
   ],
   providers: [PasswordService],

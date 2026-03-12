@@ -28,7 +28,7 @@ import { CreateBidDto } from "./dto/create-bid.dto";
 import { UpdateBidDto } from "./dto/update-bid.dto";
 import { HireFreelancerDto } from "./dto/hire-freelancer.dto";
 import { UsersService } from "src/user/user.service";
-import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { ActiveFreelancerGuard } from "src/auth/guards/user-roles/active-freelancer.guard";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import { Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
@@ -42,7 +42,7 @@ export class BidController {
   ) {}
 
   @Post()
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @UseInterceptors(FilesInterceptor("attachments", 10)) // Max 10 files
   @ApiBearerAuth("JWT-auth")
   @ApiConsumes("multipart/form-data")
@@ -241,7 +241,7 @@ export class BidController {
   }
 
   @Get(":id/freelancer")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get bid details (freelancer view)",
@@ -286,7 +286,7 @@ export class BidController {
   }
 
   @Patch(":id/withdraw")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Withdraw a bid",
