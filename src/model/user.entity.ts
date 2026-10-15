@@ -27,6 +27,7 @@ export enum UserStatus {
   ACTIVE = "active",
   SUSPENDED = "suspended",
   PENDING = "pending",
+  NOT_ACTIVATED = "not_activated",
 }
 
 @Entity("user")
@@ -64,7 +65,7 @@ export class User extends SoftDeletableEntity {
     type: "enum",
     enum: UserStatus,
     nullable: false,
-    default: UserStatus.PENDING,
+    default: UserStatus.NOT_ACTIVATED,
     name: "user_status",
   })
   status: UserStatus;

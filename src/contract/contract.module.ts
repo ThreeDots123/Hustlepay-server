@@ -11,6 +11,7 @@ import { UserModule } from "src/user/user.module";
 import { Wallet } from "src/model/wallet.entity";
 import { TransactionModule } from "src/transaction/transaction.module";
 import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
     forwardRef(() => UserModule),
     forwardRef(() => TransactionModule),
     CloudinaryModule,
+    forwardRef(() => AuthModule),
   ],
   providers: [ContractService],
   controllers: [ContractController],

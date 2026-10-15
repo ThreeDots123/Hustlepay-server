@@ -26,7 +26,7 @@ import { MilestoneService } from "./milestone.service";
 import { CreateMilestoneDto } from "./dto/create-milestone.dto";
 import { SubmitMilestoneDto } from "./dto/submit-milestone.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
-import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { ActiveFreelancerGuard } from "src/auth/guards/user-roles/active-freelancer.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
@@ -172,7 +172,7 @@ export class MilestoneController {
   }
 
   @Post(":id/accept")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Accept parent milestone",
@@ -217,7 +217,7 @@ export class MilestoneController {
   }
 
   @Post(":id/submit")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @UseInterceptors(FilesInterceptor("files", 10))
   @ApiBearerAuth("JWT-auth")
   @ApiConsumes("multipart/form-data")

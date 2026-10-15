@@ -9,6 +9,7 @@ import { Wallet } from "src/model/wallet.entity";
 import { UserModule } from "src/user/user.module";
 import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
 import { TransactionModule } from "src/transaction/transaction.module";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TransactionModule } from "src/transaction/transaction.module";
     forwardRef(() => UserModule),
     CloudinaryModule,
     TransactionModule,
+    AuthModule,
   ],
   providers: [MilestoneService],
   controllers: [MilestoneController],

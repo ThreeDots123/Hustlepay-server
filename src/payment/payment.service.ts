@@ -16,7 +16,12 @@ import { User } from "src/model/user.entity";
 import { PaystackService } from "./paystack.service";
 import { InitiatePaymentDto, PaymentMode } from "./dto/create-payment.dto";
 import { ContractService } from "src/contract/contract.service";
-import { FRONTEND_URL, PAYSTACK_SECRET_KEY } from "src/config/env";
+import {
+  FRONTEND_URL,
+  PAYSTACK_SECRET_KEY,
+  PLATFORM_FEE_PERCENT,
+  PLATFORM_FEE_FIXED,
+} from "src/config/env";
 import { TransactionService } from "src/transaction/transaction.service";
 import { TransactionType } from "src/model/transaction.entity";
 import { Wallet } from "src/model/wallet.entity";
@@ -38,6 +43,107 @@ export class PaymentService {
     private readonly contractService: ContractService,
     private readonly transactionService: TransactionService,
   ) {}
+
+  /**
+   * Calculates platform fee for a given subtotal (percentage + optional fixed).
+   * Fee is rounded to nearest integer (same unit as amount, e.g. NGN).
+   */
+  private calculatePlatformFee(subtotal: number): number {
+    const percent =
+      Number(this.configService.get<string>(PLATFORM_FEE_PERCENT)) || 0;
+    const fixed =
+      Number(this.configService.get<string>(PLATFORM_FEE_FIXED)) || 0;
+    const fromPercent = Math.round((subtotal * percent) / 100);
+    return fromPercent + fixed;
+  }
+
+  /**
+   * Get checkout breakdown (subtotal, platform fee, total) for the checkout page.
+   * Used for both full contract and milestone payments.
+   */
+  async getCheckoutDetails(
+    userId: string,
+    data: {
+      contractId: string;
+      paymentMode: PaymentMode;
+      milestoneId?: string;
+    },
+  ): Promise<{
+    subtotal: number;
+    platformFee: number;
+    total: number;
+    currency: string;
+    paymentMode: PaymentMode;
+    contractId: string;
+    milestoneId?: string;
+    milestoneTitle?: string;
+  }> {
+    const contract = await this.contractRepo.findOne({
+      where: { id: data.contractId },
+      relations: ["proposal"],
+    });
+
+    if (!contract) {
+      throw new NotFoundException("Contract not found");
+    }
+
+    if (contract.clientId !== userId) {
+      throw new ForbiddenException(
+        "You can only view checkout for your own contracts",
+      );
+    }
+
+    const currency = (contract.currency || "ngn").toLowerCase();
+    let subtotal: number;
+    let milestoneTitle: string | undefined;
+
+    if (data.paymentMode === PaymentMode.FULL) {
+      if (contract.status !== ContractStatus.AWAITING_PAYMENT) {
+        throw new BadRequestException(
+          `Contract must be in AWAITING_PAYMENT for full payment. Current: ${contract.status}`,
+        );
+      }
+      subtotal = contract.amount;
+    } else {
+      if (!data.milestoneId) {
+        throw new BadRequestException(
+          "milestoneId is required when paymentMode is MILESTONE",
+        );
+      }
+      const milestone = await this.milestoneRepo.findOne({
+        where: { id: data.milestoneId },
+      });
+      if (!milestone || milestone.contractId !== contract.id) {
+        throw new NotFoundException("Milestone not found");
+      }
+      if (!milestone.parentId) {
+        throw new BadRequestException(
+          "Cannot pay for parent milestones directly",
+        );
+      }
+      if (milestone.status !== MilestoneStatus.PENDING) {
+        throw new BadRequestException(
+          `Milestone must be PENDING. Current: ${milestone.status}`,
+        );
+      }
+      subtotal = milestone.amount;
+      milestoneTitle = milestone.title;
+    }
+
+    const platformFee = this.calculatePlatformFee(subtotal);
+    const total = subtotal + platformFee;
+
+    return {
+      subtotal,
+      platformFee,
+      total,
+      currency,
+      paymentMode: data.paymentMode,
+      contractId: data.contractId,
+      milestoneId: data.milestoneId,
+      milestoneTitle,
+    };
+  }
 
   async initiatePayment(
     client: User,
@@ -85,14 +191,19 @@ export class PaymentService {
         }
       }
 
-      // Validate amount based on payment mode
+      // Validate amount based on payment mode (dto.amount must be total = subtotal + platform fee)
       const currency = dto.currency || contract.currency || "ngn";
       let milestone: Milestone | null = null;
+      let subtotal: number;
+      let platformFee: number;
 
       if (dto.paymentMode === PaymentMode.FULL) {
-        if (dto.amount !== contract.amount) {
+        subtotal = contract.amount;
+        platformFee = this.calculatePlatformFee(subtotal);
+        const expectedTotal = subtotal + platformFee;
+        if (dto.amount !== expectedTotal) {
           throw new BadRequestException(
-            `Full payment amount must match contract amount. Expected: ${contract.amount}, Got: ${dto.amount}`,
+            `Full payment amount must match checkout total (subtotal + platform fee). Expected: ${expectedTotal}, Got: ${dto.amount}. Get checkout details first.`,
           );
         }
       } else if (dto.paymentMode === PaymentMode.MILESTONE) {
@@ -149,10 +260,12 @@ export class PaymentService {
           );
         }
 
-        // Validate payment amount matches milestone amount
-        if (dto.amount !== milestone.amount) {
+        subtotal = milestone.amount;
+        platformFee = this.calculatePlatformFee(subtotal);
+        const expectedTotal = subtotal + platformFee;
+        if (dto.amount !== expectedTotal) {
           throw new BadRequestException(
-            `Payment amount must match milestone amount. Expected: ${milestone.amount}, Got: ${dto.amount}`,
+            `Payment amount must match checkout total (subtotal + platform fee). Expected: ${expectedTotal}, Got: ${dto.amount}. Get checkout details first.`,
           );
         }
 
@@ -167,7 +280,9 @@ export class PaymentService {
 
         // Check if any existing payment is for this milestone
         const hasExistingMilestonePayment = existingPayments.some(
-          (payment) => payment.providerRaw?.milestoneId === dto.milestoneId,
+          (payment) =>
+            payment.providerRaw?.metadata?.milestoneId === dto.milestoneId ||
+            (payment.providerRaw as any)?.milestoneId === dto.milestoneId,
         );
 
         if (hasExistingMilestonePayment) {
@@ -179,6 +294,8 @@ export class PaymentService {
         // Update milestone status to PAYMENT_INITIATED
         milestone.status = MilestoneStatus.PAYMENT_INITIATED;
         await manager.save(milestone);
+      } else {
+        throw new BadRequestException("Invalid payment mode");
       }
 
       // For full payment mode, check if there's already an active payment for this contract
@@ -201,11 +318,13 @@ export class PaymentService {
         await manager.save(contract);
       }
 
-      // Create payment record
+      // Create payment record (amount = total charged; subtotalAmount/platformFeeAmount for profit tracking)
       const payment = manager.create(Payment, {
         contract,
         payer: client,
         amount: dto.amount,
+        subtotalAmount: subtotal,
+        platformFeeAmount: platformFee,
         currency: currency.toLowerCase(),
         status: PaymentStatus.PENDING,
         // Store metadata in providerRaw for later retrieval
@@ -305,6 +424,47 @@ export class PaymentService {
     });
 
     return payments;
+  }
+
+  /**
+   * Get platform profit from fees (for tracking). Counts payments that are ESCROWED or RELEASED.
+   */
+  async getPlatformProfit(): Promise<{
+    totalProfit: number;
+    currency: string;
+    payments: Array<{
+      id: string;
+      amount: number;
+      subtotalAmount: number | null;
+      platformFeeAmount: number | null;
+      status: PaymentStatus;
+      contractId: string;
+      createdAt: Date;
+    }>;
+  }> {
+    const payments = await this.paymentRepo.find({
+      where: {
+        status: In([PaymentStatus.ESCROWED, PaymentStatus.RELEASED]),
+      },
+      order: { createdAt: "DESC" },
+    });
+
+    const withFee = payments.filter((p) => p.platformFeeAmount != null);
+    const totalProfit = withFee.reduce((sum, p) => sum + (p.platformFeeAmount ?? 0), 0);
+
+    return {
+      totalProfit,
+      currency: "ngn",
+      payments: withFee.map((p) => ({
+        id: p.id,
+        amount: p.amount,
+        subtotalAmount: p.subtotalAmount ?? null,
+        platformFeeAmount: p.platformFeeAmount ?? null,
+        status: p.status,
+        contractId: p.contractId,
+        createdAt: p.createdAt,
+      })),
+    };
   }
 
   /**

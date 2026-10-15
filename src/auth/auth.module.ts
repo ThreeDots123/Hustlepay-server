@@ -7,6 +7,7 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { UsersService } from "src/user/user.service";
 import { JwtStrategy } from "./jwt.strategy";
+import { ActiveFreelancerGuard } from "./guards/user-roles/active-freelancer.guard";
 import { JWT_SECRET } from "src/config/env";
 import { User } from "src/model/user.entity";
 import { PasswordModule } from "src/password/password.module";
@@ -32,7 +33,8 @@ import { Wallet } from "src/model/wallet.entity";
       }),
     }),
   ],
-  providers: [AuthService, UsersService, JwtStrategy],
+  providers: [AuthService, UsersService, JwtStrategy, ActiveFreelancerGuard],
   controllers: [AuthController],
+  exports: [ActiveFreelancerGuard],
 })
 export class AuthModule {}

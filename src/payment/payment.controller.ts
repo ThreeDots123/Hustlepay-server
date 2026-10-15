@@ -6,6 +6,7 @@ import {
   Req,
   Get,
   Param,
+  Query,
   Headers,
   BadRequestException,
 } from "@nestjs/common";
@@ -19,7 +20,7 @@ import {
   ApiExcludeEndpoint,
 } from "@nestjs/swagger";
 import { PaymentService } from "./payment.service";
-import { InitiatePaymentDto } from "./dto/create-payment.dto";
+import { InitiatePaymentDto, PaymentMode } from "./dto/create-payment.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
 import { Request } from "express";
@@ -33,6 +34,63 @@ export class PaymentController {
     private readonly paymentService: PaymentService,
     private userService: UsersService,
   ) {}
+
+  @Get("checkout")
+  @UseGuards(IsClientGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get checkout details",
+    description:
+      "Returns subtotal, platform fee, and total for the checkout page. Use before initiating payment for full contract or milestone.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Checkout breakdown",
+    schema: {
+      type: "object",
+      properties: {
+        subtotal: { type: "number" },
+        platformFee: { type: "number" },
+        total: { type: "number" },
+        currency: { type: "string" },
+        paymentMode: { enum: ["full", "milestone"] },
+        contractId: { type: "string" },
+        milestoneId: { type: "string" },
+        milestoneTitle: { type: "string" },
+      },
+    },
+  })
+  @ApiResponse({ status: 403, description: "Forbidden - not the contract client" })
+  @ApiResponse({ status: 404, description: "Contract or milestone not found" })
+  async getCheckoutDetails(
+    @Req() request: Request,
+    @Query("contractId") contractId: string,
+    @Query("paymentMode") paymentMode: string,
+    @Query("milestoneId") milestoneId?: string,
+  ) {
+    if (!contractId) {
+      throw new BadRequestException("contractId is required");
+    }
+    const mode =
+      paymentMode === "full"
+        ? PaymentMode.FULL
+        : paymentMode === "milestone"
+          ? PaymentMode.MILESTONE
+          : null;
+    if (mode === null) {
+      throw new BadRequestException(
+        "paymentMode must be 'full' or 'milestone'",
+      );
+    }
+    const { id } = request.user as AuthorisedRequest;
+    return this.paymentService.getCheckoutDetails(id, {
+      contractId,
+      paymentMode: mode,
+      ...(mode === PaymentMode.MILESTONE && milestoneId
+        ? { milestoneId }
+        : {}),
+    });
+  }
 
   @Post("initiate")
   @UseGuards(IsClientGuard)
@@ -93,6 +151,44 @@ export class PaymentController {
     });
 
     return this.paymentService.initiatePayment(user, dto);
+  }
+
+  @Get("profit")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({
+    summary: "Get platform profit from payment fees",
+    description:
+      "Returns total profit (sum of platform fees) and per-payment breakdown for payments that are escrowed or released.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Profit summary and payment list",
+    schema: {
+      type: "object",
+      properties: {
+        totalProfit: { type: "number" },
+        currency: { type: "string" },
+        payments: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              amount: { type: "number" },
+              subtotalAmount: { type: "number" },
+              platformFeeAmount: { type: "number" },
+              status: { type: "string" },
+              contractId: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+        },
+      },
+    },
+  })
+  async getPlatformProfit(@Req() request: Request) {
+    return this.paymentService.getPlatformProfit();
   }
 
   @Get("contract/:contractId")

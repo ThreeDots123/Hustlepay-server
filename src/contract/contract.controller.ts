@@ -27,7 +27,7 @@ import { ContractService } from "./contract.service";
 import { CreateContractDto } from "./dto/create-contract.dto";
 import { SubmitContractDto } from "./dto/submit-contract.dto";
 import { IsClientGuard } from "src/auth/guards/user-roles/client.guard";
-import { IsFreelancerGuard } from "src/auth/guards/user-roles/freelancer.guard";
+import { ActiveFreelancerGuard } from "src/auth/guards/user-roles/active-freelancer.guard";
 import { Request } from "express";
 import { AuthorisedRequest } from "src/common/types";
 import { UsersService } from "src/user/user.service";
@@ -218,7 +218,7 @@ export class ContractController {
   }
 
   @Get("freelancer/active")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get active contracts for freelancer",
@@ -251,7 +251,7 @@ export class ContractController {
   }
 
   @Get("freelancer/completed")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({
     summary: "Get completed contracts for freelancer",
@@ -326,7 +326,7 @@ export class ContractController {
   }
 
   @Post(":id/submit")
-  @UseGuards(IsFreelancerGuard)
+  @UseGuards(ActiveFreelancerGuard)
   @UseInterceptors(FilesInterceptor("files", 10))
   @ApiBearerAuth("JWT-auth")
   @ApiConsumes("multipart/form-data")
