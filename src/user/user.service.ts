@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, FindOptionsWhere, Repository } from "typeorm";
 import {
+  AuthMethod,
   User as UserEntity,
   UserRole,
   UserStatus,
@@ -30,7 +31,7 @@ export class UsersService extends BaseService {
   }
 
   async createUser(
-    userData: Omit<CreateUserDto, "password">,
+    userData: Omit<CreateUserDto, "password"> & { authMethod?: AuthMethod },
     transactionalEntity?: EntityManager,
   ) {
     const newUserInstance = this.usersRepository.create({

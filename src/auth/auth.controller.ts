@@ -2,9 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
+  Query,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -17,7 +20,7 @@ import {
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../user/dto/create-user-pswrd.dto";
 import transformToAuthenticatedUser from "src/transformers/authenticated-user";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { AuthorisedRequest } from "src/common/types";
 import { UsersService } from "src/user/user.service";
 import { EmailService } from "src/email/email.service";
@@ -25,6 +28,13 @@ import { TokenService } from "src/token/token.service";
 import { OtpPurpose } from "src/model/otp.entity";
 import { JwtAuthGuard } from "./guards/jwt.guard";
 import { VerifyEmailTokenDto } from "src/token/dto/verify-token.dto";
+import { ConfigService } from "@nestjs/config";
+import {
+  FRONTEND_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_REDIRECT_URI,
+} from "src/config/env";
+import { UserRole } from "src/model/user.entity";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -34,6 +44,7 @@ export class AuthController {
     private usersService: UsersService,
     private emailService: EmailService,
     private tokenService: TokenService,
+    private configService: ConfigService,
   ) {}
 
   @Post("verify/initiate")
@@ -268,5 +279,99 @@ export class AuthController {
       ...result,
       user: transformToAuthenticatedUser(result.user),
     };
+  }
+
+  @Get("google")
+  googleLogin(
+    @Query("action") action: "signup" | "login" = "login",
+    @Query("role") role: UserRole = UserRole.CLIENT,
+    @Query("redirect") redirect?: string,
+    @Res() response?: Response,
+  ) {
+    const statePayload = {
+      action,
+      role: action === "signup" ? role : UserRole.CLIENT,
+      ...(redirect ? { redirect } : {}),
+    };
+    const state = Buffer.from(JSON.stringify(statePayload)).toString("base64");
+    const clientId = this.configService.getOrThrow<string>(GOOGLE_CLIENT_ID);
+    const redirectUri =
+      this.configService.getOrThrow<string>(GOOGLE_REDIRECT_URI);
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: "openid email profile",
+      access_type: "offline",
+      prompt: "consent",
+      state,
+    });
+
+    return response?.redirect(
+      `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
+    );
+  }
+
+  @Get("google/callback")
+  async googleLoginCallback(
+    @Query("code") code: string,
+    @Query("state") state: string,
+    @Res() response: Response,
+  ) {
+    const frontendUrl = this.configService.getOrThrow<string>(FRONTEND_URL);
+    let redirect: string | undefined;
+    let action: "signup" | "login" = "login";
+    let role: UserRole = UserRole.CLIENT;
+
+    try {
+      const params: {
+        redirect?: string;
+        action: "signup" | "login";
+        role: UserRole;
+      } = JSON.parse(Buffer.from(state, "base64").toString("utf-8"));
+      redirect = params.redirect;
+      action = params.action || "login";
+      role = params.role || UserRole.CLIENT;
+    } catch {
+      return response.redirect(
+        `${frontendUrl}/account/login?error=invalid_google_state`,
+      );
+    }
+
+    if (!code) {
+      const errorParams = new URLSearchParams({
+        error: "google_auth_failed",
+        ...(redirect ? { redirect } : {}),
+      });
+      return response.redirect(`${frontendUrl}/account/${action}?${errorParams}`);
+    }
+
+    try {
+      const { access_token } = await this.authService.handleGoogleCallback(
+        code,
+        action || "login",
+        role,
+      );
+      const successParams = new URLSearchParams({
+        access_token,
+        ...(redirect ? { redirect } : {}),
+      });
+      return response.redirect(
+        `${frontendUrl}/account/${action}?${successParams.toString()}`,
+      );
+    } catch (err: any) {
+      const message =
+        (err?.response?.message as string) ||
+        err?.message ||
+        "google_auth_failed";
+      const errorParams = new URLSearchParams({
+        error: message,
+        ...(redirect ? { redirect } : {}),
+      });
+      return response.redirect(
+        `${frontendUrl}/account/${action}?${errorParams.toString()}`,
+      );
+    }
   }
 }

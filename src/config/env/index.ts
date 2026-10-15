@@ -27,3 +27,7 @@ export const PAYSTACK_SECRET_KEY = "PAYSTACK_SECRET_KEY";
 export const PLATFORM_FEE_PERCENT = "PLATFORM_FEE_PERCENT";
 /** Platform fee: fixed amount in same unit as payment (e.g. NGN). */
 export const PLATFORM_FEE_FIXED = "PLATFORM_FEE_FIXED";
+
+export const GOOGLE_CLIENT_ID = "GOOGLE_CLIENT_ID";
+export const GOOGLE_SECRET_KEY = "GOOGLE_SECRET_KEY";
+export const GOOGLE_REDIRECT_URI = "GOOGLE_REDIRECT_URI";
